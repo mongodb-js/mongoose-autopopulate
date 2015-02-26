@@ -2,6 +2,9 @@
 
 Always `populate()` certain fields in your mongoose schemas
 
+[![Build Status](https://travis-ci.org/vkarpov15/mongoose-autopopulate.svg?branch=master)](https://travis-ci.org/vkarpov15/mongoose-autopopulate)
+[![Coverage Status](https://coveralls.io/repos/vkarpov15/mongoose-autopopulate/badge.svg?branch=master)](https://coveralls.io/r/vkarpov15/mongoose-autopopulate?branch=master)
+
 **Note:** This plugin will *only* work with mongoose >= 4.0. Do NOT use
 this plugin with mongoose 3.x. You have been warned.
 
