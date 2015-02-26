@@ -4,7 +4,9 @@
   "description": "Always populate() certain fields in your mongoose schemas",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "./node_modules/mocha/bin/mocha ./test/unit.js",
+    "test-all": "./node_modules/mocha/bin/mocha ./test/*.js",
+    "test-integration": "./node_modules/mocha/bin/mocha ./test/integration.js"
   },
   "repository": {
     "type": "git",
