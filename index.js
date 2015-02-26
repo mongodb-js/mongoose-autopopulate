@@ -13,32 +13,8 @@ module.exports = function(schema) {
     var numPaths = pathsToPopulate.length;
     var optionsToUse;
     for (var i = 0; i < numPaths; ++i) {
-      if (typeof pathsToPopulate[i].autopopulate !== 'function' &&
-          typeof pathsToPopulate[i].autopopulate !== 'object') {
-        this.populate(pathsToPopulate[i].path);
-        continue;
-      }
-
-      if (typeof pathsToPopulate[i].autopopulate === 'object') {
-        optionsToUse = { path: pathsToPopulate[i].path };
-        mergeOptions(optionsToUse, pathsToPopulate[i].autopopulate);
-        this.populate(optionsToUse);
-        continue;
-      }
-
-      var populateOptions = pathsToPopulate[i].autopopulate.call(this);
-      if (!populateOptions) {
-        continue;        
-      }
-      if (typeof populateOptions !== 'object') {
-        this.populate(pathsToPopulate[i].path);
-        continue;
-      }
-
-      optionsToUse = { path: pathsToPopulate[i].path };
-      mergeOptions(optionsToUse, populateOptions);
-
-      this.populate(optionsToUse);
+      processOption.call(this,
+        pathsToPopulate[i].autopopulate, pathsToPopulate[i].path);
     }
   };
 
@@ -46,6 +22,37 @@ module.exports = function(schema) {
     pre('find', autopopulateHandler).
     pre('findOne', autopopulateHandler);
 };
+
+function processOption(value, path) {
+  switch (typeof value) {
+    case 'function':
+      handleFunction.call(this, value, path);
+      break;
+    case 'object':
+      handleObject.call(this, value, path);
+      break;
+    default:
+      handlePrimitive.call(this, value, path);
+      break;
+  }
+}
+
+function handlePrimitive(value, path) {
+  if (value) {
+    this.populate(path);
+  }
+}
+
+function handleObject(value, path) {
+  var optionsToUse = { path: path };
+  mergeOptions(optionsToUse, value);
+  this.populate(optionsToUse);
+}
+
+function handleFunction(fn, path) {
+  var val = fn.call(this);
+  processOption.call(this, val, path);
+}
 
 function mergeOptions(destination, source) {
   var keys = Object.keys(source);

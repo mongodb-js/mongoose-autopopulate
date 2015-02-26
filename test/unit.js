@@ -2,7 +2,7 @@ var plugin = require('../');
 var assert = require('assert');
 var _ = require('underscore');
 
-describe('mongoose-autopopulate plugin', function() {
+describe('mongoose-autopopulate:unit', function() {
   var schemaStub;
   var queryStub;
   var paths = [];
