@@ -6,3 +6,6 @@ test-unit:
 
 test-all:
 	./node_modules/mocha/bin/mocha ./test/*.js
+
+docs:
+	node docs.js
