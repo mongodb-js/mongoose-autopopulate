@@ -23,11 +23,11 @@
     "acquit": "0.0.3",
     "istanbul": "0.3.2",
     "mocha": "2.1.0",
-    "mongoose": "4.0.0-rc2",
+    "mongoose": "4.0.3",
     "underscore": "1.5.2"
   },
   "peerDependencies": {
-    "mongoose": ">= 4.0.0-rc0"
+    "mongoose": "~4.0"
   },
   "author": "Valeri Karpov <val@karpov.io>",
   "license": "Apache 2.0",
