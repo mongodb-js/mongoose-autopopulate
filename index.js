@@ -2,7 +2,7 @@ var mongoose = require('mongoose');
 
 module.exports = function(schema) {
   var pathsToPopulate = [];
-  schema.eachPath(function (pathname, schemaType) {
+  eachPathRecursive(schema, function(pathname, schemaType) {
     if (schemaType.options && schemaType.options.autopopulate) {
       var option = schemaType.options.autopopulate;
       pathsToPopulate.push({ path: pathname, autopopulate: option });
@@ -11,7 +11,6 @@ module.exports = function(schema) {
 
   var autopopulateHandler = function() {
     var numPaths = pathsToPopulate.length;
-    var optionsToUse;
     for (var i = 0; i < numPaths; ++i) {
       processOption.call(this,
         pathsToPopulate[i].autopopulate, pathsToPopulate[i].path);
@@ -60,4 +59,19 @@ function mergeOptions(destination, source) {
   for (var i = 0; i < numKeys; ++i) {
     destination[keys[i]] = source[keys[i]];
   }
+}
+
+function eachPathRecursive(schema, cb, path) {
+  if (!path) {
+    path = [];
+  }
+  schema.eachPath(function(pathname, schemaType) {
+    path.push(pathname);
+    if (schemaType.schema) {
+      eachPathRecursive(schemaType.schema, cb, path);
+    } else {
+      cb(path.join('.'), schemaType);
+    }
+    path.pop();
+  });
 }
