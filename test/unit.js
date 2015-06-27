@@ -133,6 +133,34 @@ describe('mongoose-autopopulate:unit', function() {
     schemaStub.pre.calls[0].handler.call(queryStub);
     assert.equal(0, queryStub.populate.calls.length);
   });
+
+  it('handles nested schemas', function() {
+    var nestedPath = {
+      name: 'test',
+      options: {
+        options: {
+          autopopulate: true
+        }
+      }
+    };
+
+    var topLevel = {
+      name: 'nested',
+      options: {
+        schema: createSchemaStub([nestedPath])
+      }
+    };
+
+    var schema = createSchemaStub([topLevel]);
+
+    var p = plugin(schema);
+    assert.equal(schema.pre.calls.length, 2);
+    assert.equal(queryStub.populate.calls.length, 0);
+
+    schema.pre.calls[0].handler.call(queryStub);
+    assert.deepEqual(queryStub.populate.calls[0],
+      'nested.test');
+  });
 });
 
 function createSchemaStub(paths) {
