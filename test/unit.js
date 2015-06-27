@@ -8,18 +8,6 @@ describe('mongoose-autopopulate:unit', function() {
   var paths = [];
 
   beforeEach(function() {
-    schemaStub = {};
-    schemaStub.pre = function(func, handler) {
-      schemaStub.pre.calls.push({ func: func, handler: handler });
-      return schemaStub;
-    };
-    schemaStub.pre.calls = [];
-    schemaStub.eachPath = function(handler) {
-      _.each(paths, function(path) {
-        handler(path.name, path.options);
-      });
-    };
-
     queryStub = {};
     queryStub.populate = function(obj) {
       queryStub.populate.calls.push(obj);
@@ -29,6 +17,7 @@ describe('mongoose-autopopulate:unit', function() {
 
   it('populates when paths autopopulate option is true', function() {
     paths = [{ name: 'test', options: { options: { autopopulate: true } } }];
+    schemaStub = createSchemaStub(paths);
     var p = plugin(schemaStub);
     assert.equal(2, schemaStub.pre.calls.length);
     assert.equal(0, queryStub.populate.calls.length);
@@ -44,6 +33,7 @@ describe('mongoose-autopopulate:unit', function() {
       { name: 'test2', options: { options: { autopopulate: false } } },
       { name: 'test3', options: { options: { autopopulate: null } } }
     ];
+    schemaStub = createSchemaStub(paths);
     var p = plugin(schemaStub);
     assert.equal(2, schemaStub.pre.calls.length);
     assert.equal(0, queryStub.populate.calls.length);
@@ -64,6 +54,8 @@ describe('mongoose-autopopulate:unit', function() {
         }
       },
     ];
+    schemaStub = createSchemaStub(paths);
+
     var p = plugin(schemaStub);
     assert.equal(2, schemaStub.pre.calls.length);
     assert.equal(0, queryStub.populate.calls.length);
@@ -86,6 +78,7 @@ describe('mongoose-autopopulate:unit', function() {
         }
       },
     ];
+    schemaStub = createSchemaStub(paths);
     var p = plugin(schemaStub);
     assert.equal(2, schemaStub.pre.calls.length);
     assert.equal(0, queryStub.populate.calls.length);
@@ -108,6 +101,8 @@ describe('mongoose-autopopulate:unit', function() {
         }
       },
     ];
+    schemaStub = createSchemaStub(paths);
+
     var p = plugin(schemaStub);
     assert.equal(2, schemaStub.pre.calls.length);
     assert.equal(0, queryStub.populate.calls.length);
@@ -130,6 +125,7 @@ describe('mongoose-autopopulate:unit', function() {
         }
       },
     ];
+    schemaStub = createSchemaStub(paths);
     var p = plugin(schemaStub);
     assert.equal(2, schemaStub.pre.calls.length);
     assert.equal(0, queryStub.populate.calls.length);
@@ -138,3 +134,19 @@ describe('mongoose-autopopulate:unit', function() {
     assert.equal(0, queryStub.populate.calls.length);
   });
 });
+
+function createSchemaStub(paths) {
+  schemaStub = {};
+  schemaStub.pre = function(func, handler) {
+    schemaStub.pre.calls.push({ func: func, handler: handler });
+    return schemaStub;
+  };
+  schemaStub.pre.calls = [];
+  schemaStub.eachPath = function(handler) {
+    _.each(paths, function(path) {
+      handler(path.name, path.options);
+    });
+  };
+
+  return schemaStub;
+}

@@ -61,16 +61,16 @@ function mergeOptions(destination, source) {
   }
 }
 
-function eachPathRecursive(schema, cb, path) {
+function eachPathRecursive(schema, handler, path) {
   if (!path) {
     path = [];
   }
   schema.eachPath(function(pathname, schemaType) {
     path.push(pathname);
     if (schemaType.schema) {
-      eachPathRecursive(schemaType.schema, cb, path);
+      eachPathRecursive(schemaType.schema, handler, path);
     } else {
-      cb(path.join('.'), schemaType);
+      handler(path.join('.'), schemaType);
     }
     path.pop();
   });
