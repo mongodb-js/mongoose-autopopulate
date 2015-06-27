@@ -23,7 +23,7 @@
     "acquit": "0.0.3",
     "istanbul": "0.3.2",
     "mocha": "2.1.0",
-    "mongoose": "4.0.3",
+    "mongoose": "4.0.6",
     "underscore": "1.5.2"
   },
   "peerDependencies": {
