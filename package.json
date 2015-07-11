@@ -11,7 +11,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/vkarpov15/mongoose-autopopulate.git"
+    "url": "https://github.com/mongodb-js/mongoose-autopopulate.git"
   },
   "keywords": [
     "mongoose",
@@ -32,7 +32,7 @@
   "author": "Valeri Karpov <val@karpov.io>",
   "license": "Apache 2.0",
   "bugs": {
-    "url": "https://github.com/vkarpov15/mongoose-autopopulate/issues"
+    "url": "https://github.com/mongodb-js/mongoose-autopopulate/issues"
   },
-  "homepage": "https://github.com/vkarpov15/mongoose-autopopulate"
+  "homepage": "https://github.com/mongodb-js/mongoose-autopopulate"
 }
