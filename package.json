@@ -4,10 +4,10 @@
   "description": "Always populate() certain fields in your mongoose schemas",
   "main": "index.js",
   "scripts": {
-    "test": "./node_modules/mocha/bin/mocha ./test/unit.js",
-    "test-all": "./node_modules/mocha/bin/mocha ./test/*.js",
-    "test-integration": "./node_modules/mocha/bin/mocha ./test/integration.js",
-    "test-travis": "./node_modules/istanbul/lib/cli.js cover ./node_modules/mocha/bin/_mocha -- -R spec ./test/*"
+    "test": "mocha ./test/unit.js",
+    "test-all": "mocha ./test/*.js",
+    "test-integration": "mocha ./test/integration.js",
+    "test-travis": "istanbul cover ./node_modules/mocha/bin/_mocha -- -R spec ./test/*"
   },
   "repository": {
     "type": "git",
