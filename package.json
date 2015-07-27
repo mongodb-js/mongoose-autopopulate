@@ -27,7 +27,7 @@
     "underscore": "1.5.2"
   },
   "peerDependencies": {
-    "mongoose": "~4.0"
+    "mongoose": "4.x"
   },
   "author": "Valeri Karpov <val@karpov.io>",
   "license": "Apache 2.0",
