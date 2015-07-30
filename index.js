@@ -5,7 +5,13 @@ module.exports = function(schema) {
   eachPathRecursive(schema, function(pathname, schemaType) {
     if (schemaType.options && schemaType.options.autopopulate) {
       var option = schemaType.options.autopopulate;
-      pathsToPopulate.push({ path: pathname, autopopulate: option });
+      pathsToPopulate.push({
+        options: schemaType.options.ref ? {
+          path: pathname,
+          model: schemaType.options.ref
+        } : { path: pathname },
+        autopopulate: option
+      });
     }
   });
 
@@ -13,7 +19,7 @@ module.exports = function(schema) {
     var numPaths = pathsToPopulate.length;
     for (var i = 0; i < numPaths; ++i) {
       processOption.call(this,
-        pathsToPopulate[i].autopopulate, pathsToPopulate[i].path);
+        pathsToPopulate[i].autopopulate, pathsToPopulate[i].options);
     }
   };
 
@@ -22,35 +28,34 @@ module.exports = function(schema) {
     pre('findOne', autopopulateHandler);
 };
 
-function processOption(value, path) {
+function processOption(value, options) {
   switch (typeof value) {
     case 'function':
-      handleFunction.call(this, value, path);
+      handleFunction.call(this, value, options);
       break;
     case 'object':
-      handleObject.call(this, value, path);
+      handleObject.call(this, value, options);
       break;
     default:
-      handlePrimitive.call(this, value, path);
+      handlePrimitive.call(this, value, options);
       break;
   }
 }
 
-function handlePrimitive(value, path) {
+function handlePrimitive(value, options) {
   if (value) {
-    this.populate(path);
+    this.populate(options);
   }
 }
 
-function handleObject(value, path) {
-  var optionsToUse = { path: path };
+function handleObject(value, optionsToUse) {
   mergeOptions(optionsToUse, value);
   this.populate(optionsToUse);
 }
 
-function handleFunction(fn, path) {
+function handleFunction(fn, options) {
   var val = fn.call(this);
-  processOption.call(this, val, path);
+  processOption.call(this, val, options);
 }
 
 function mergeOptions(destination, source) {
