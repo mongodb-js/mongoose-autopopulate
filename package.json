@@ -1,6 +1,6 @@
 {
   "name": "mongoose-autopopulate",
-  "version": "0.2.0",
+  "version": "0.3.0",
   "description": "Always populate() certain fields in your mongoose schemas",
   "main": "index.js",
   "scripts": {
