@@ -7,19 +7,16 @@ module.exports = function(schema) {
     if (schemaType.options && schemaType.options.autopopulate) {
       option = schemaType.options.autopopulate;
       pathsToPopulate.push({
-        options: schemaType.options.ref ? {
-          path: pathname,
-          model: schemaType.options.ref
-        } : { path: pathname },
+        options: defaultOptions(pathname, schemaType.options),
         autopopulate: option
       });
-    } else if (schemaType.options && schemaType.options.type && schemaType.options.type[0] && schemaType.options.type[0].autopopulate) {
+    } else if (schemaType.options &&
+        schemaType.options.type &&
+        schemaType.options.type[0] &&
+        schemaType.options.type[0].autopopulate) {
       option = schemaType.options.type[0].autopopulate;
       pathsToPopulate.push({
-        options: schemaType.options.type[0].ref ? {
-          path: pathname,
-          model: schemaType.options.type[0].ref
-        } : { path: pathname },
+        options: defaultOptions(pathname, schemaType.options.type[0]),
         autopopulate: option
       });
     }
@@ -37,6 +34,14 @@ module.exports = function(schema) {
     pre('find', autopopulateHandler).
     pre('findOne', autopopulateHandler);
 };
+
+function defaultOptions(pathname, v) {
+  var ret = { path: pathname };
+  if (v.ref) {
+    ret.model = v.ref;
+  }
+  return ret;
+}
 
 function processOption(value, options) {
   switch (typeof value) {

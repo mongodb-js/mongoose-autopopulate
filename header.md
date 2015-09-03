@@ -47,7 +47,6 @@ And your "bands" collection has one document:
   _id: '54ef3f374849dcaa649a3abd',
   name: "Guns N' Roses",
   lead: '54ef3f374849dcaa649a3abc',
+  members: ['54ef3f374849dcaa649a3abc']
 }
 ```
-
-

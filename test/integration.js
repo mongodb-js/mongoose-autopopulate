@@ -14,7 +14,8 @@ describe('mongoose-autopopulate plugin', function() {
     var personSchema = new Schema({ name: String, birthName: String });
     var bandSchema = new Schema({
       name: String,
-      lead: { type: ObjectId, ref: 'people' }
+      lead: { type: ObjectId, ref: 'people' },
+      members: [{ type: ObjectId, ref: 'people', autopopulate: true }]
     });
     Person = mongoose.model('people', personSchema, 'people');
     Band = mongoose.model('band', bandSchema, 'bands');
@@ -34,6 +35,7 @@ describe('mongoose-autopopulate plugin', function() {
           assert.ifError(error);
           assert.ok(doc);
           gnr.lead = doc._id;
+          gnr.members = [doc._id];
           Band.create(gnr, function(error, doc) {
             assert.ifError(error);
             assert.ok(doc);
@@ -67,6 +69,25 @@ describe('mongoose-autopopulate plugin', function() {
   });
 
   /**
+   *  `mongoose-autopopulate` also works on arrays.
+   */
+  it('supports document arrays', function(done) {
+    var bandSchema = new Schema({
+      name: String,
+      members: [{ type: ObjectId, ref: 'people', autopopulate: true }]
+    });
+    bandSchema.plugin(autopopulate);
+
+    var Band = mongoose.model('band4', bandSchema, 'bands');
+    Band.findOne({ name: "Guns N' Roses" }, function(error, doc) {
+      assert.ifError(error);
+      assert.equal('Axl Rose', doc.members[0].name);
+      assert.equal('William Bruce Rose, Jr.', doc.members[0].birthName);
+      done();
+    });
+  });
+
+  /**
    *  Advanced users of `populate()` may want to specify additional
    *  options, such as selecting fields. If you set the `autopopulate`
    *  option to an object, `mongoose-autopopulate` will merge the object
@@ -80,7 +101,7 @@ describe('mongoose-autopopulate plugin', function() {
     });
     bandSchema.plugin(autopopulate);
 
-    var Band = mongoose.model('band2', bandSchema, 'bands');
+    var Band = mongoose.model('band5', bandSchema, 'bands');
     Band.findOne({ name: "Guns N' Roses" }, function(error, doc) {
       assert.ifError(error);
       assert.equal('Axl Rose', doc.lead.name);
@@ -109,7 +130,7 @@ describe('mongoose-autopopulate plugin', function() {
     });
     bandSchema.plugin(autopopulate);
 
-    var Band = mongoose.model('band4', bandSchema, 'bands');
+    var Band = mongoose.model('band6', bandSchema, 'bands');
     Band.find({ name: "Guns N' Roses" }, function(error, docs) {
       assert.ifError(error);
       assert.equal(1, docs.length);

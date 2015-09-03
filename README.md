@@ -2,7 +2,7 @@
 
 Always `populate()` certain fields in your mongoose schemas
 
-[![Build Status](https://travis-ci.org/mongodb-js/mongoose-autopopulate.svg?branch=master)](https://travis-ci.org/vkarpov15/mongoose-autopopulate)
+[![Build Status](https://travis-ci.org/mongodb-js/mongoose-autopopulate.svg?branch=master)](https://travis-ci.org/mongodb-js/mongoose-autopopulate)
 [![Coverage Status](https://coveralls.io/repos/mongodb-js/mongoose-autopopulate/badge.svg?branch=master)](https://coveralls.io/r/mongodb-js/mongoose-autopopulate?branch=master)
 
 **Note:** This plugin will *only* work with mongoose >= 4.0. Do NOT use
@@ -47,10 +47,9 @@ And your "bands" collection has one document:
   _id: '54ef3f374849dcaa649a3abd',
   name: "Guns N' Roses",
   lead: '54ef3f374849dcaa649a3abc',
+  members: ['54ef3f374849dcaa649a3abc']
 }
 ```
-
-
 #### It supports an autopopulate option in schemas
 
 
@@ -78,6 +77,30 @@ for you.
   
 ```
 
+#### It supports document arrays
+
+
+`mongoose-autopopulate` also works on arrays.
+
+
+```javascript
+    
+    var bandSchema = new Schema({
+      name: String,
+      members: [{ type: ObjectId, ref: 'people', autopopulate: true }]
+    });
+    bandSchema.plugin(autopopulate);
+
+    var Band = mongoose.model('band4', bandSchema, 'bands');
+    Band.findOne({ name: "Guns N' Roses" }, function(error, doc) {
+      assert.ifError(error);
+      assert.equal('Axl Rose', doc.members[0].name);
+      assert.equal('William Bruce Rose, Jr.', doc.members[0].birthName);
+      done();
+    });
+  
+```
+
 #### It can specify an options argument
 
 
@@ -96,7 +119,7 @@ into populate options. The `findOne()` below is equivalent to
     });
     bandSchema.plugin(autopopulate);
 
-    var Band = mongoose.model('band2', bandSchema, 'bands');
+    var Band = mongoose.model('band5', bandSchema, 'bands');
     Band.findOne({ name: "Guns N' Roses" }, function(error, doc) {
       assert.ifError(error);
       assert.equal('Axl Rose', doc.lead.name);
@@ -130,7 +153,7 @@ example.
     });
     bandSchema.plugin(autopopulate);
 
-    var Band = mongoose.model('band4', bandSchema, 'bands');
+    var Band = mongoose.model('band6', bandSchema, 'bands');
     Band.find({ name: "Guns N' Roses" }, function(error, docs) {
       assert.ifError(error);
       assert.equal(1, docs.length);
