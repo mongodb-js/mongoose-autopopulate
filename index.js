@@ -3,12 +3,22 @@ var mongoose = require('mongoose');
 module.exports = function(schema) {
   var pathsToPopulate = [];
   eachPathRecursive(schema, function(pathname, schemaType) {
+    var option;
     if (schemaType.options && schemaType.options.autopopulate) {
-      var option = schemaType.options.autopopulate;
+      option = schemaType.options.autopopulate;
       pathsToPopulate.push({
         options: schemaType.options.ref ? {
           path: pathname,
           model: schemaType.options.ref
+        } : { path: pathname },
+        autopopulate: option
+      });
+    } else if (schemaType.options && schemaType.options.type && schemaType.options.type[0] && schemaType.options.type[0].autopopulate) {
+      option = schemaType.options.type[0].autopopulate;
+      pathsToPopulate.push({
+        options: schemaType.options.type[0].ref ? {
+          path: pathname,
+          model: schemaType.options.type[0].ref
         } : { path: pathname },
         autopopulate: option
       });
