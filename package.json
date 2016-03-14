@@ -4,8 +4,7 @@
   "description": "Always populate() certain fields in your mongoose schemas",
   "main": "index.js",
   "scripts": {
-    "test": "mocha ./test/unit.js",
-    "test-all": "mocha ./test/*.js",
+    "test": "mocha ./test/*.js",
     "test-integration": "mocha ./test/integration.js",
     "test-travis": "istanbul cover ./node_modules/mocha/bin/_mocha -- -R spec ./test/*"
   },
