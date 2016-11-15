@@ -19,11 +19,11 @@
     "mongodb"
   ],
   "devDependencies": {
-    "acquit": "0.0.3",
-    "istanbul": "0.3.2",
-    "mocha": "2.2.5",
+    "acquit": "0.4.1",
+    "istanbul": "0.4.5",
+    "mocha": "3.1.2",
     "mongoose": "4.x",
-    "underscore": "1.5.2"
+    "underscore": "1.8.3"
   },
   "peerDependencies": {
     "mongoose": "4.x"
