@@ -21,7 +21,7 @@
   "devDependencies": {
     "acquit": "0.4.1",
     "istanbul": "0.4.5",
-    "mocha": "3.1.2",
+    "mocha": "3.2.0",
     "mongoose": "4.x",
     "underscore": "1.8.3"
   },
