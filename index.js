@@ -23,6 +23,7 @@ module.exports = function(schema) {
   });
 
   var autopopulateHandler = function() {
+    if (this._mongooseOptions && this._mongooseOptions.lean) return;
     var numPaths = pathsToPopulate.length;
     for (var i = 0; i < numPaths; ++i) {
       processOption.call(this,
