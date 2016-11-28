@@ -23,14 +23,16 @@ module.exports = function(schema) {
     }
   });
 
-  Object.keys(schema.virtuals).forEach(function(pathname) {
-    if (schema.virtuals[pathname].options.autopopulate) {
-      pathsToPopulate.push({
-        options: defaultOptions(pathname, schema.virtuals[pathname].options),
-        autopopulate: schema.virtuals[pathname].options.autopopulate,
-      });
-    }
-  });
+  if (schema.virtuals) {
+    Object.keys(schema.virtuals).forEach(function(pathname) {
+      if (schema.virtuals[pathname].options.autopopulate) {
+        pathsToPopulate.push({
+          options: defaultOptions(pathname, schema.virtuals[pathname].options),
+          autopopulate: schema.virtuals[pathname].options.autopopulate,
+        });
+      }
+    });
+  }
 
   var autopopulateHandler = function() {
     var numPaths = pathsToPopulate.length;
