@@ -1,3 +1,8 @@
+0.5.0 / 2016-11-29
+==================
+ * feat: support lean #27 #14 [siboulet](https://github.com/siboulet)
+ * feat: support virtual autopopulate #24 [siboulet](https://github.com/siboulet)
+
 0.4.0 / 2015-09-03
 ==================
  * added; support for arrays #9 [rerthal](https://github.com/rerthal)
