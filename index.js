@@ -2,6 +2,7 @@ var mongoose = require('mongoose');
 
 module.exports = function(schema) {
   var pathsToPopulate = [];
+
   eachPathRecursive(schema, function(pathname, schemaType) {
     var option;
     if (schemaType.options && schemaType.options.autopopulate) {
@@ -21,6 +22,17 @@ module.exports = function(schema) {
       });
     }
   });
+
+  if (schema.virtuals) {
+    Object.keys(schema.virtuals).forEach(function(pathname) {
+      if (schema.virtuals[pathname].options.autopopulate) {
+        pathsToPopulate.push({
+          options: defaultOptions(pathname, schema.virtuals[pathname].options),
+          autopopulate: schema.virtuals[pathname].options.autopopulate,
+        });
+      }
+    });
+  }
 
   var autopopulateHandler = function() {
     var numPaths = pathsToPopulate.length;
