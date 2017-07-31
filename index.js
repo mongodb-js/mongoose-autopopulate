@@ -35,7 +35,13 @@ module.exports = function(schema) {
   }
 
   var autopopulateHandler = function() {
-    if (this._mongooseOptions && this._mongooseOptions.lean) return;
+    if (this._mongooseOptions && this._mongooseOptions.lean) {
+      return;
+    }
+
+    if (this.options && this.options.autopopulate === false) {
+      return;
+    }
     var numPaths = pathsToPopulate.length;
     for (var i = 0; i < numPaths; ++i) {
       processOption.call(this,

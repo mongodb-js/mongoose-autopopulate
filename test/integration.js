@@ -141,4 +141,25 @@ describe('mongoose-autopopulate plugin', function() {
       done();
     });
   });
+
+  /**
+   *  If you set the `autopopulate` option to `false` on a query, autopopulate
+   *  will be disabled. This is handy if you want to autopopulate by default,
+   *  but opt-out for special cases.
+   */
+  it('can disable autopopulate for individual queries', function(done) {
+    var bandSchema = new Schema({
+      name: String,
+      lead: { type: ObjectId, ref: 'people', autopopulate: true }
+    });
+    bandSchema.plugin(autopopulate);
+
+    var Band = mongoose.model('band7', bandSchema, 'bands');
+    Band.findOne({ name: "Guns N' Roses" }, {}, { autopopulate: false }, function(error, doc) {
+      assert.ifError(error);
+      assert.ok(doc.lead instanceof mongoose.Types.ObjectId);
+      assert.ok(!doc.populated('lead'));
+      done();
+    });
+  });
 });
