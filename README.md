@@ -16,6 +16,10 @@ in your schema - your data will become unwieldy as the array grows and
 you will eventually hit the [16mb document size limit](http://docs.mongodb.org/manual/reference/limits/#BSON-Document-Size).
 In general, think carefully when designing your schemas.
 
+# Instalation 
+
+`npm install --save mongoose-autopopulate`
+
 # API
 
 The `mongoose-autopopulate` module exposes a single function that you can
@@ -192,3 +196,26 @@ but opt-out for special cases.
   
 ```
 
+# Typescript Support
+
+Example of using a Class with Typescript
+
+```typescript
+import * as mongoose from 'mongoose';
+import * as autopopulate from 'mongoose-autopopulate';
+
+class BandSchema extends mongoose.Schema {
+
+  constructor() {
+    super({
+      name: String,
+      lead: { type: ObjectId, ref: 'people', autopopulate: true }
+    });
+
+    super.plugin(autopopulate);
+  }
+
+}
+
+export default mongoose.model('band7', new BandSchema(), 'bands');
+```
