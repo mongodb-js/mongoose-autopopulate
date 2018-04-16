@@ -192,3 +192,10 @@ but opt-out for special cases.
   
 ```
 
+## Typescript usage
+
+In order to use this package with typescript all you need to do is
+```typescript
+import * as autopopulate from "mongoose-autopopulate";
+```
+
