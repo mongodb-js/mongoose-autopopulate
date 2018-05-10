@@ -61,7 +61,8 @@ describe('mongoose-autopopulate:unit', function() {
 
     schemaStub.pre.calls[0].handler.call(queryStub);
     assert.equal(1, queryStub.populate.calls.length);
-    assert.deepEqual({ path: 'test', select: 'name' }, queryStub.populate.calls[0]);
+    assert.deepEqual(queryStub.populate.calls[0],
+      { path: 'test', select: 'name', options: { _depth: 1, maxDepth: 10 } });
   });
 
   it('can execute function options', function() {
@@ -108,7 +109,8 @@ describe('mongoose-autopopulate:unit', function() {
 
     schemaStub.pre.calls[0].handler.call(queryStub);
     assert.equal(1, queryStub.populate.calls.length);
-    assert.deepEqual({ path: 'test', select: 'name' }, queryStub.populate.calls[0]);
+    assert.deepEqual(queryStub.populate.calls[0],
+      { path: 'test', select: 'name', options: { maxDepth: 10, _depth: 1 } });
   });
 
   it('doesnt populate when autopopulate function returns falsy', function() {

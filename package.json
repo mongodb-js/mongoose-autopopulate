@@ -6,7 +6,7 @@
   "scripts": {
     "test": "mocha ./test/*.js",
     "test-integration": "mocha ./test/integration.js",
-    "test-travis": "nyc --reporter=lcov --reporter=text-lcov npm test && nyc check-coverage --lines 90 --functions 90 --branches 90"
+    "test-travis": "nyc --reporter=lcov npm test && nyc check-coverage --lines 80 --functions 80 --branches 80"
   },
   "repository": {
     "type": "git",

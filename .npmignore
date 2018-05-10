@@ -1,0 +1,7 @@
+Makefile
+test/
+.travis.yml
+History.md
+.nyc_output
+coverage
+.gitignore

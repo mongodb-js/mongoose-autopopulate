@@ -29,8 +29,8 @@ describe('bug fixes', function() {
     }, opts);
     rootSchema.plugin(autopopulate);
 
-    const Root = mongoose.model('root', rootSchema);
-    const Tag = mongoose.model('tags', { name: String });
+    const Root = db.model('root', rootSchema);
+    const Tag = db.model('tags', { name: String });
 
     const inheritSchema = new Schema({
       customTags:[{
