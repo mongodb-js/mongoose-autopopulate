@@ -1,3 +1,8 @@
+0.7.0 / 2018-05-10
+==================
+ * BREAKING CHANGE: drop support for Node.js < 4.0.0
+ * feat: add `maxDepth` option, set to 10 by default #37 #20 #11
+
 0.5.0 / 2016-11-29
 ==================
  * feat: support lean #27 #14 [siboulet](https://github.com/siboulet)
