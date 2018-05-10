@@ -56,7 +56,6 @@ describe('bug fixes', function() {
     function test(id) {
       Inherit.findById(id).exec(function(error, doc) {
         assert.ifError(error);
-        console.log(doc);
         assert.equal(doc.customTags[0].item.name, 'cool');
         assert.equal(doc.customTags[1].item.name, 'sweet');
         done();

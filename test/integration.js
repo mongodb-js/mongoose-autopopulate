@@ -46,6 +46,10 @@ describe('mongoose-autopopulate plugin', function() {
     });
   });
 
+  after(function() {
+    return mongoose.disconnect();
+  });
+
   /**
    *  You can set the `autopopulate` option for the `lead` field.
    *  This means that, every time you call `find()` or `findOne()`,

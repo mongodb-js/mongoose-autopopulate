@@ -1,6 +1,5 @@
 var plugin = require('../');
 var assert = require('assert');
-var _ = require('underscore');
 
 describe('mongoose-autopopulate:unit', function() {
   var schemaStub;
@@ -171,7 +170,7 @@ function createSchemaStub(paths) {
   };
   schemaStub.pre.calls = [];
   schemaStub.eachPath = function(handler) {
-    _.each(paths, function(path) {
+    paths.forEach(function(path) {
       handler(path.name, path.options);
     });
   };
