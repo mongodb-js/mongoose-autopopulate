@@ -1,16 +1,20 @@
-var mongoose = require('mongoose');
-var assert = require('assert');
-var autopopulate = require('../');
-var Schema = mongoose.Schema;
-var ObjectId = mongoose.Schema.Types.ObjectId;
+'use strict';
 
-mongoose.connect('mongodb://localhost:27017/autopopulate');
+const assert = require('assert');
+const autopopulate = require('../');
+const co = require('co');
+const mongoose = require('mongoose');
+
+const Schema = mongoose.Schema;
+const ObjectId = mongoose.Schema.Types.ObjectId;
 
 describe('mongoose-autopopulate plugin', function() {
   var Band;
   var Person;
 
   before(function(done) {
+    mongoose.connect('mongodb://localhost:27017/autopopulate');
+
     var personSchema = new Schema({ name: String, birthName: String });
     var bandSchema = new Schema({
       name: String,
@@ -164,6 +168,45 @@ describe('mongoose-autopopulate plugin', function() {
       assert.ok(doc.lead instanceof mongoose.Types.ObjectId);
       assert.ok(!doc.populated('lead'));
       done();
+    });
+  });
+
+  /**
+   *  Recursive populate can lead to messy infinite recursion, so this plugin
+   *  supports a `maxDepth` option that limits how deep recursive population
+   *  will go. The `maxDepth` option is 10 by default
+   */
+  it('can limit the depth using `maxDepth`', function() {
+    return co(function*() {
+      const accountSchema = new mongoose.Schema({
+        name: String,
+        friends: [{
+          type: mongoose.Schema.Types.ObjectId,
+          ref: 'Account',
+          // This is a recursive relationship, `friends` points to a list
+          // of accounts. If we didn't limit the depth, this would result
+          // in infinite recursion!
+          autopopulate: { maxDepth: 2 }
+        }]
+      });
+      accountSchema.plugin(autopopulate);
+
+      const Account = mongoose.model('Account', accountSchema);
+
+      const axl = new Account({ name: 'Axl' });
+      const slash = new Account({ name: 'Slash', friends: [axl._id] });
+      axl.friends.push(slash._id);
+
+      yield axl.save();
+      yield slash.save();
+
+      const doc = yield Account.findById(axl._id);
+
+      assert.equal(doc.friends[0].name, 'Slash');
+      assert.equal(doc.friends[0].friends[0].name, 'Axl');
+      // Only populate 2 levels deep, 3rd level will still be an `_id`
+      assert.equal(doc.friends[0].friends[0].friends[0].toString(),
+        slash._id.toHexString());
     });
   });
 });

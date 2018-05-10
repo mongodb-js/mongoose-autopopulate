@@ -1,11 +1,14 @@
-var mongoose = require('mongoose');
-var assert = require('assert');
-var autopopulate = require('../');
-var Schema = mongoose.Schema;
-var ObjectId = mongoose.Schema.Types.ObjectId;
+'use strict';
+
+const assert = require('assert');
+const autopopulate = require('../');
+const co = require('co');
+const mongoose = require('mongoose');
+const Schema = mongoose.Schema;
+const ObjectId = mongoose.Schema.Types.ObjectId;
 
 describe('bug fixes', function() {
-  var db;
+  let db;
 
   before(function() {
     db = mongoose.createConnection('mongodb://localhost:27017/autopopulate');
@@ -16,20 +19,20 @@ describe('bug fixes', function() {
   });
 
   it('gh-15', function(done) {
-    var opts = {
+    const opts = {
       timestamps: { createdAt: 'createdAt' },
       collection : 'collections',
       discriminatorKey : '_type'
     };
-    var rootSchema = mongoose.Schema({
+    const rootSchema = mongoose.Schema({
       name: { type: String, required: true }
     }, opts);
     rootSchema.plugin(autopopulate);
 
-    var Root = mongoose.model('root', rootSchema);
-    var Tag = mongoose.model('tags', { name: String });
+    const Root = mongoose.model('root', rootSchema);
+    const Tag = mongoose.model('tags', { name: String });
 
-    var inheritSchema = new Schema({
+    const inheritSchema = new Schema({
       customTags:[{
         item: {
           type: mongoose.Schema.Types.ObjectId,
@@ -39,7 +42,7 @@ describe('bug fixes', function() {
       }]
     }, { discriminatorKey : '_type' } );
     inheritSchema.plugin(autopopulate);
-    var Inherit = Root.discriminator('inherit', inheritSchema);
+    const Inherit = Root.discriminator('inherit', inheritSchema);
 
     Tag.create([{ name: 'cool' }, { name: 'sweet' }], function(error, docs) {
       assert.ifError(error);

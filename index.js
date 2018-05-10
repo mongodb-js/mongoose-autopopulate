@@ -1,10 +1,12 @@
-var mongoose = require('mongoose');
+'use strict';
+
+const mongoose = require('mongoose');
 
 module.exports = function(schema) {
-  var pathsToPopulate = [];
+  const pathsToPopulate = [];
 
   eachPathRecursive(schema, function(pathname, schemaType) {
-    var option;
+    let option;
     if (schemaType.options && schemaType.options.autopopulate) {
       option = schemaType.options.autopopulate;
       pathsToPopulate.push({
@@ -39,11 +41,21 @@ module.exports = function(schema) {
       return;
     }
 
-    if (this.options && this.options.autopopulate === false) {
+    const options = this.options || {};
+    if (options.autopopulate === false) {
       return;
     }
-    var numPaths = pathsToPopulate.length;
-    for (var i = 0; i < numPaths; ++i) {
+
+    const depth = options._depth != null ? options._depth : 0;
+    if (options.maxDepth > 0 && depth >= options.maxDepth) {
+      return;
+    }
+
+    const numPaths = pathsToPopulate.length;
+    for (let i = 0; i < numPaths; ++i) {
+      pathsToPopulate[i].options = pathsToPopulate[i].options || {};
+      pathsToPopulate[i].options.options = pathsToPopulate[i].options.options || {};
+      Object.assign(pathsToPopulate[i].options.options, { _depth: depth + 1 });
       processOption.call(this,
         pathsToPopulate[i].autopopulate, pathsToPopulate[i].options);
     }
@@ -55,7 +67,7 @@ module.exports = function(schema) {
 };
 
 function defaultOptions(pathname, v) {
-  var ret = { path: pathname };
+  const ret = { path: pathname, options: { maxDepth: 10 } };
   if (v.ref) {
     ret.model = v.ref;
   }
@@ -83,19 +95,25 @@ function handlePrimitive(value, options) {
 }
 
 function handleObject(value, optionsToUse) {
-  mergeOptions(optionsToUse, value);
+  // Special case: support top-level `maxDepth`
+  if (value.maxDepth != null) {
+    optionsToUse.options = optionsToUse.options || {};
+    optionsToUse.options.maxDepth = value.maxDepth;
+    delete value.maxDepth;
+  }
+  optionsToUse = Object.assign({}, optionsToUse, value);
   this.populate(optionsToUse);
 }
 
 function handleFunction(fn, options) {
-  var val = fn.call(this);
+  const val = fn.call(this);
   processOption.call(this, val, options);
 }
 
 function mergeOptions(destination, source) {
-  var keys = Object.keys(source);
-  var numKeys = keys.length;
-  for (var i = 0; i < numKeys; ++i) {
+  const keys = Object.keys(source);
+  const numKeys = keys.length;
+  for (let i = 0; i < numKeys; ++i) {
     destination[keys[i]] = source[keys[i]];
   }
 }

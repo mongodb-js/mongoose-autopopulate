@@ -1,11 +1,13 @@
 var acquit = require('acquit');
 
+require('acquit-ignore')();
+
 var content = require('fs').readFileSync('./test/integration.js').toString();
 var header = require('fs').readFileSync('./header.md').toString();
 var blocks = acquit.parse(content);
 
 var mdOutput = header;
- 
+
 for (var i = 0; i < blocks.length; ++i) {
   var describe = blocks[i];
 

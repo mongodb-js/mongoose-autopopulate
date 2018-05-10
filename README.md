@@ -60,21 +60,19 @@ for you.
 
 
 ```javascript
-    
     var bandSchema = new Schema({
-      name: String,
-      lead: { type: ObjectId, ref: 'people', autopopulate: true }
-    });
-    bandSchema.plugin(autopopulate);
+  name: String,
+  lead: { type: ObjectId, ref: 'people', autopopulate: true }
+});
+bandSchema.plugin(autopopulate);
 
-    var Band = mongoose.model('band3', bandSchema, 'bands');
-    Band.findOne({ name: "Guns N' Roses" }, function(error, doc) {
-      assert.ifError(error);
-      assert.equal('Axl Rose', doc.lead.name);
-      assert.equal('William Bruce Rose, Jr.', doc.lead.birthName);
-      done();
-    });
-  
+var Band = mongoose.model('band3', bandSchema, 'bands');
+Band.findOne({ name: "Guns N' Roses" }, function(error, doc) {
+  assert.ifError(error);
+  assert.equal('Axl Rose', doc.lead.name);
+  assert.equal('William Bruce Rose, Jr.', doc.lead.birthName);
+  done();
+});
 ```
 
 #### It supports document arrays
@@ -84,21 +82,19 @@ for you.
 
 
 ```javascript
-    
     var bandSchema = new Schema({
-      name: String,
-      members: [{ type: ObjectId, ref: 'people', autopopulate: true }]
-    });
-    bandSchema.plugin(autopopulate);
+  name: String,
+  members: [{ type: ObjectId, ref: 'people', autopopulate: true }]
+});
+bandSchema.plugin(autopopulate);
 
-    var Band = mongoose.model('band4', bandSchema, 'bands');
-    Band.findOne({ name: "Guns N' Roses" }, function(error, doc) {
-      assert.ifError(error);
-      assert.equal('Axl Rose', doc.members[0].name);
-      assert.equal('William Bruce Rose, Jr.', doc.members[0].birthName);
-      done();
-    });
-  
+var Band = mongoose.model('band4', bandSchema, 'bands');
+Band.findOne({ name: "Guns N' Roses" }, function(error, doc) {
+  assert.ifError(error);
+  assert.equal('Axl Rose', doc.members[0].name);
+  assert.equal('William Bruce Rose, Jr.', doc.members[0].birthName);
+  done();
+});
 ```
 
 #### It can specify an options argument
@@ -112,21 +108,19 @@ into populate options. The `findOne()` below is equivalent to
 
 
 ```javascript
-    
     var bandSchema = new Schema({
-      name: String,
-      lead: { type: ObjectId, ref: 'people', autopopulate: { select: 'name' } }
-    });
-    bandSchema.plugin(autopopulate);
+  name: String,
+  lead: { type: ObjectId, ref: 'people', autopopulate: { select: 'name' } }
+});
+bandSchema.plugin(autopopulate);
 
-    var Band = mongoose.model('band5', bandSchema, 'bands');
-    Band.findOne({ name: "Guns N' Roses" }, function(error, doc) {
-      assert.ifError(error);
-      assert.equal('Axl Rose', doc.lead.name);
-      assert.ok(!doc.lead.birthName);
-      done();
-    });
-  
+var Band = mongoose.model('band5', bandSchema, 'bands');
+Band.findOne({ name: "Guns N' Roses" }, function(error, doc) {
+  assert.ifError(error);
+  assert.equal('Axl Rose', doc.lead.name);
+  assert.ok(!doc.lead.birthName);
+  done();
+});
 ```
 
 #### It can specify a function that returns options
@@ -140,30 +134,28 @@ example.
 
 
 ```javascript
-    
     var numCalls = 0;
-    var optionsFunction = function() {
-      ++numCalls;
-      return { select: 'name' };
-    };
+var optionsFunction = function() {
+  ++numCalls;
+  return { select: 'name' };
+};
 
-    var bandSchema = new Schema({
-      name: String,
-      lead: { type: ObjectId, ref: 'people', autopopulate: optionsFunction }
-    });
-    bandSchema.plugin(autopopulate);
+var bandSchema = new Schema({
+  name: String,
+  lead: { type: ObjectId, ref: 'people', autopopulate: optionsFunction }
+});
+bandSchema.plugin(autopopulate);
 
-    var Band = mongoose.model('band6', bandSchema, 'bands');
-    Band.find({ name: "Guns N' Roses" }, function(error, docs) {
-      assert.ifError(error);
-      assert.equal(1, docs.length);
-      assert.equal(1, numCalls);
-      var doc = docs[0];
-      assert.equal('Axl Rose', doc.lead.name);
-      assert.ok(!doc.lead.birthName);
-      done();
-    });
-  
+var Band = mongoose.model('band6', bandSchema, 'bands');
+Band.find({ name: "Guns N' Roses" }, function(error, docs) {
+  assert.ifError(error);
+  assert.equal(1, docs.length);
+  assert.equal(1, numCalls);
+  var doc = docs[0];
+  assert.equal('Axl Rose', doc.lead.name);
+  assert.ok(!doc.lead.birthName);
+  done();
+});
 ```
 
 #### It can disable autopopulate for individual queries
@@ -175,20 +167,59 @@ but opt-out for special cases.
 
 
 ```javascript
-    
     var bandSchema = new Schema({
-      name: String,
-      lead: { type: ObjectId, ref: 'people', autopopulate: true }
-    });
-    bandSchema.plugin(autopopulate);
+  name: String,
+  lead: { type: ObjectId, ref: 'people', autopopulate: true }
+});
+bandSchema.plugin(autopopulate);
 
-    var Band = mongoose.model('band7', bandSchema, 'bands');
-    Band.findOne({ name: "Guns N' Roses" }, {}, { autopopulate: false }, function(error, doc) {
-      assert.ifError(error);
-      assert.ok(doc.lead instanceof mongoose.Types.ObjectId);
-      assert.ok(!doc.populated('lead'));
-      done();
-    });
-  
+var Band = mongoose.model('band7', bandSchema, 'bands');
+Band.findOne({ name: "Guns N' Roses" }, {}, { autopopulate: false }, function(error, doc) {
+  assert.ifError(error);
+  assert.ok(doc.lead instanceof mongoose.Types.ObjectId);
+  assert.ok(!doc.populated('lead'));
+  done();
+});
 ```
 
+#### It can limit the depth using `maxDepth`
+
+
+Recursive populate can lead to messy infinite recursion, so this plugin
+supports a `maxDepth` option that limits how deep recursive population
+will go. The `maxDepth` option is 10 by default
+
+
+```javascript
+return co(function*() {
+  const accountSchema = new mongoose.Schema({
+    name: String,
+    friends: [{
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'Account',
+      // This is a recursive relationship, `friends` points to a list
+      // of accounts. If we didn't limit the depth, this would result
+      // in infinite recursion!
+      autopopulate: { maxDepth: 2 }
+    }]
+  });
+  accountSchema.plugin(autopopulate);
+
+  const Account = mongoose.model('Account', accountSchema);
+
+  const axl = new Account({ name: 'Axl' });
+  const slash = new Account({ name: 'Slash', friends: [axl._id] });
+  axl.friends.push(slash._id);
+
+  yield axl.save();
+  yield slash.save();
+
+  const doc = yield Account.findById(axl._id);
+
+  assert.equal(doc.friends[0].name, 'Slash');
+  assert.equal(doc.friends[0].friends[0].name, 'Axl');
+  // Only populate 2 levels deep, 3rd level will still be an `_id`
+  assert.equal(doc.friends[0].friends[0].friends[0].toString(),
+    slash._id.toHexString());
+});
+```
