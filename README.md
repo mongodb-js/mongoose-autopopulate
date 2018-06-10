@@ -50,7 +50,11 @@ And your "bands" collection has one document:
   members: ['54ef3f374849dcaa649a3abc']
 }
 ```
-#### It supports an autopopulate option in schemas
+
+
+# mongoose-autopopulate plugin
+
+## It supports an autopopulate option in schemas
 
 
 You can set the `autopopulate` option for the `lead` field.
@@ -60,7 +64,7 @@ for you.
 
 
 ```javascript
-    var bandSchema = new Schema({
+var bandSchema = new Schema({
   name: String,
   lead: { type: ObjectId, ref: 'people', autopopulate: true }
 });
@@ -75,14 +79,14 @@ Band.findOne({ name: "Guns N' Roses" }, function(error, doc) {
 });
 ```
 
-#### It supports document arrays
+## It supports document arrays
 
 
 `mongoose-autopopulate` also works on arrays.
 
 
 ```javascript
-    var bandSchema = new Schema({
+var bandSchema = new Schema({
   name: String,
   members: [{ type: ObjectId, ref: 'people', autopopulate: true }]
 });
@@ -97,7 +101,7 @@ Band.findOne({ name: "Guns N' Roses" }, function(error, doc) {
 });
 ```
 
-#### It can specify an options argument
+## It can specify an options argument
 
 
 Advanced users of `populate()` may want to specify additional
@@ -108,7 +112,7 @@ into populate options. The `findOne()` below is equivalent to
 
 
 ```javascript
-    var bandSchema = new Schema({
+var bandSchema = new Schema({
   name: String,
   lead: { type: ObjectId, ref: 'people', autopopulate: { select: 'name' } }
 });
@@ -123,7 +127,7 @@ Band.findOne({ name: "Guns N' Roses" }, function(error, doc) {
 });
 ```
 
-#### It can specify a function that returns options
+## It can specify a function that returns options
 
 
 You can also set the `autopopulate` option to be a function.
@@ -134,7 +138,7 @@ example.
 
 
 ```javascript
-    var numCalls = 0;
+var numCalls = 0;
 var optionsFunction = function() {
   ++numCalls;
   return { select: 'name' };
@@ -158,7 +162,7 @@ Band.find({ name: "Guns N' Roses" }, function(error, docs) {
 });
 ```
 
-#### It can disable autopopulate for individual queries
+## It can disable autopopulate for individual queries
 
 
 If you set the `autopopulate` option to `false` on a query, autopopulate
@@ -167,7 +171,7 @@ but opt-out for special cases.
 
 
 ```javascript
-    var bandSchema = new Schema({
+var bandSchema = new Schema({
   name: String,
   lead: { type: ObjectId, ref: 'people', autopopulate: true }
 });
@@ -182,7 +186,7 @@ Band.findOne({ name: "Guns N' Roses" }, {}, { autopopulate: false }, function(er
 });
 ```
 
-#### It can disable autopopulate in `populate()` options
+## It can disable autopopulate in `populate()` options
 
 
 Say you have a model `User` that has the autopopulate plugin and you're
@@ -192,7 +196,7 @@ option.
 
 
 ```javascript
-    const userSchema = new Schema({
+const userSchema = new Schema({
   name: String,
   friends: [{
     type: Schema.Types.ObjectId,
@@ -227,7 +231,7 @@ return co(function*() {
 });
 ```
 
-#### It can limit the depth using `maxDepth`
+## It can limit the depth using `maxDepth`
 
 
 Recursive populate can lead to messy infinite recursion, so this plugin
@@ -236,7 +240,7 @@ will go. The `maxDepth` option is 10 by default
 
 
 ```javascript
-    return co(function*() {
+return co(function*() {
   const accountSchema = new mongoose.Schema({
     name: String,
     friends: [{
@@ -268,4 +272,3 @@ will go. The `maxDepth` option is 10 by default
     slash._id.toHexString());
 });
 ```
-

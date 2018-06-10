@@ -4,6 +4,7 @@
   "description": "Always populate() certain fields in your mongoose schemas",
   "main": "index.js",
   "scripts": {
+    "docs": "acquit-markdown -r acquit-ignore -p ./test/integration.js -h ./header.md > README.md",
     "test": "mocha ./test/*.js",
     "test-integration": "mocha ./test/integration.js",
     "test-travis": "nyc --reporter=lcov npm test && nyc check-coverage --lines 80 --functions 80 --branches 80"
@@ -19,8 +20,9 @@
     "mongodb"
   ],
   "devDependencies": {
-    "acquit": "0.6.3",
+    "acquit": "1.0.0",
     "acquit-ignore": "0.0.3",
+    "acquit-markdown": "0.1.0",
     "co": "4.6.0",
     "mocha": "5.1.1",
     "mongoose": "5.x",
