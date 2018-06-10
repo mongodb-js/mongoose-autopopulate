@@ -172,6 +172,53 @@ describe('mongoose-autopopulate plugin', function() {
   });
 
   /**
+   *  Say you have a model `User` that has the autopopulate plugin and you're
+   *  populating users from a different model. To disable autopopulate, you
+   *  need to set `autopopulate: false` as a populate option, not a query
+   *  option.
+   */
+
+  it('can disable autopopulate in `populate()` options', function() {
+    const userSchema = new Schema({
+      name: String,
+      friends: [{
+        type: Schema.Types.ObjectId,
+        ref: 'User',
+        autopopulate: { maxDepth: 2 }
+      }]
+    });
+    userSchema.plugin(autopopulate);
+
+    const responseSchema = new Schema({
+      user: {
+        type: Schema.Types.ObjectId,
+        ref: 'User'
+      }
+    });
+
+    const User = mongoose.model('User', userSchema);
+    const Response = mongoose.model('Response', responseSchema);
+
+    return co(function*() {
+      const axl = new User({ name: 'Axl' });
+      const slash = new User({ name: 'Slash', friends: [axl._id] });
+      axl.friends.push(slash._id);
+
+      yield [axl.save(), slash.save()];
+      let r = yield Response.create({ user: axl._id });
+
+      r = yield Response.findById(r._id).
+        // Because `User` is the foreign model, you need to disable autopopulate
+        // in the populate options below, not the query options
+        populate({ path: 'user', options: { autopopulate: false } });
+      // acquit:ignore:start
+      assert.equal(r.user.name, 'Axl');
+      assert.ok(r.user.friends[0] instanceof mongoose.Types.ObjectId);
+      // acquit:ignore:end
+    });
+  });
+
+  /**
    *  Recursive populate can lead to messy infinite recursion, so this plugin
    *  supports a `maxDepth` option that limits how deep recursive population
    *  will go. The `maxDepth` option is 10 by default
