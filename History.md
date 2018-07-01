@@ -1,3 +1,7 @@
+0.8.0 / 2018-07-01
+==================
+ * fix: add support for findOneAndUpdate() with autopopulate #42
+
 0.7.0 / 2018-05-10
 ==================
  * BREAKING CHANGE: drop support for Node.js < 4.0.0
