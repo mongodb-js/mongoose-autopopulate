@@ -65,4 +65,30 @@ describe('bug fixes', function() {
       });
     }
   });
+
+  it('findOneAndUpdate (gh-6641)', function() {
+    const personSchema = new Schema({ name: String });
+    const bandSchema = new Schema({
+      name: String,
+      lead: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'gh6641_Person',
+        autopopulate: true
+      }
+    });
+    bandSchema.plugin(autopopulate);
+
+    const Person = db.model('gh6641_Person', personSchema);
+    const Band = db.model('gh6641_Band', bandSchema);
+
+    return co(function*() {
+      const axl = yield Person.create({ name: 'Axl Rose' });
+      let gnr = yield Band.create({ name: 'GNR', lead: axl._id });
+
+      gnr = yield Band.
+        findOneAndUpdate({ name: 'GNR' }, { name: 'Guns N\' Roses' });
+
+      assert.equal(gnr.lead.name, 'Axl Rose');
+    });
+  });
 });
