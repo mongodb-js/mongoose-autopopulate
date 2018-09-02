@@ -91,4 +91,33 @@ describe('bug fixes', function() {
       assert.equal(gnr.lead.name, 'Axl Rose');
     });
   });
+
+  it('options function with refPath (gh-45)', function() {
+    const offerSchema = new Schema({ name: String });
+    const mappingSchema = new Schema({
+      city: String,
+      offer: {
+        type: mongoose.Schema.Types.ObjectId,
+        refPath: 'city',
+        autopopulate: function(opts) {
+          assert.equal(opts.refPath, 'city');
+          return opts;
+        }
+      }
+    });
+    mappingSchema.plugin(autopopulate);
+
+    const Offer = db.model('gh45_NewYork', offerSchema);
+    const Mapping = db.model('gh45_Mapping', mappingSchema);
+
+    return co(function*() {
+      const offer = yield Offer.create({ name: 'Labor Day Sale' });
+      const mapping = yield Mapping.create({
+        city: 'gh45_NewYork',
+        offer: offer._id
+      });
+
+      yield Mapping.findOne();
+    });
+  });
 });
