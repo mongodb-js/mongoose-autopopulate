@@ -69,8 +69,12 @@ module.exports = function(schema) {
 
 function defaultOptions(pathname, v) {
   const ret = { path: pathname, options: { maxDepth: 10 } };
-  if (v.ref) {
+  if (v.ref != null) {
     ret.model = v.ref;
+    ret.ref = v.ref;
+  }
+  if (v.refPath != null) {
+    ret.refPath = v.refPath;
   }
   return ret;
 }
@@ -107,7 +111,7 @@ function handleObject(value, optionsToUse) {
 }
 
 function handleFunction(fn, options) {
-  const val = fn.call(this);
+  const val = fn.call(this, options);
   processOption.call(this, val, options);
 }
 
