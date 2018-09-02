@@ -1,3 +1,7 @@
+0.8.1 / 2018-09-02
+==================
+ * fix: call function with options and include refPath in options #15
+
 0.8.0 / 2018-07-01
 ==================
  * fix: add support for findOneAndUpdate() with autopopulate #42
