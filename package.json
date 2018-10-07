@@ -3,8 +3,9 @@
   "version": "0.8.1",
   "description": "Always populate() certain fields in your mongoose schemas",
   "main": "index.js",
+  "homepage": "http://plugins.mongoosejs.io/plugins/autopopulate",
   "scripts": {
-    "docs": "acquit-markdown -r acquit-ignore -p ./test/integration.js -h ./header.md > README.md",
+    "docs": "acquit-markdown -r acquit-ignore -p ./test/integration.js > examples.md",
     "test": "mocha ./test/*.js",
     "test-integration": "mocha ./test/integration.js",
     "test-travis": "nyc --reporter=lcov npm test && nyc check-coverage --lines 80 --functions 80 --branches 80"

@@ -55,6 +55,35 @@ describe('mongoose-autopopulate plugin', function() {
   });
 
   /**
+   * Suppose you have two collections, "people" and "bands". The `People` model
+   * looks like this:
+   *
+   * ```javascript
+   * var personSchema = new Schema({ name: String, birthName: String });
+   * Person = mongoose.model('people', personSchema, 'people');
+   * ```
+   *
+   * Suppose your "people" collection has one document:
+   *
+   * ```javascript
+   * {
+   *   name: 'Axl Rose',
+   *   birthName: 'William Bruce Rose, Jr.',
+   *   _id: '54ef3f374849dcaa649a3abc'
+   * };
+   * ```
+   *
+   * And your "bands" collection has one document:
+   *
+   * ```javascript
+   * {
+   *   _id: '54ef3f374849dcaa649a3abd',
+   *   name: "Guns N' Roses",
+   *   lead: '54ef3f374849dcaa649a3abc',
+   *   members: ['54ef3f374849dcaa649a3abc']
+   * }
+   * ```
+   *
    *  You can set the `autopopulate` option for the `lead` field.
    *  This means that, every time you call `find()` or `findOne()`,
    *  `mongoose-autopopulate` will automatically call `.populate('lead')`
