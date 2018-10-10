@@ -1,3 +1,7 @@
+0.8.2 / 2018-10-10
+==================
+ * docs: link to new plugins site on plugins.mongoosejs.io
+
 0.8.1 / 2018-09-02
 ==================
  * fix: call function with options and include refPath in options #15
