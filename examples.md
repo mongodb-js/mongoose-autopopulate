@@ -208,6 +208,27 @@ return co(function*() {
 });
 ```
 
+## It with `lean()`
+
+
+Setting the [Mongoose `lean` option](https://mongoosejs.com/docs/api.html#query_Query-lean)
+will disable autopopulate for all paths, _unless_ you add `autopulate: true`
+to your `lean` option.
+
+
+```javascript
+// acquit:ignore:start
+return co(function*() {
+  // acquit:ignore:end
+  let band = yield Band.findOne().lean();
+  // Won't autopopulate because `lean()` is set
+  assert.ok(band.lead instanceof mongoose.Types.ObjectId);
+
+  // To turn on `autopopulate` with lean, use `lean({ autopulate: true })`
+  band = yield Band.findOne().lean({ autopopulate: true });
+  assert.equal(band.lead.name, 'Axl Rose');
+```
+
 ## It can limit the depth using `maxDepth`
 
 

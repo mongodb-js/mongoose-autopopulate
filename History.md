@@ -1,3 +1,7 @@
+0.9.0 / 2018-11-08
+==================
+ * feat: support turning on autopopulate with lean #48 #27 #14
+
 0.8.2 / 2018-10-10
 ==================
  * docs: link to new plugins site on plugins.mongoosejs.io
