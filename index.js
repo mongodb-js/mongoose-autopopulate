@@ -37,7 +37,11 @@ module.exports = function(schema) {
   }
 
   var autopopulateHandler = function() {
-    if (this._mongooseOptions && this._mongooseOptions.lean) {
+    if (this._mongooseOptions &&
+        this._mongooseOptions.lean &&
+        // If lean and user didn't explicitly do `lean({ autopulate: true })`,
+        // skip it. See gh-27, gh-14, gh-48
+        !this._mongooseOptions.lean.autopopulate) {
       return;
     }
 

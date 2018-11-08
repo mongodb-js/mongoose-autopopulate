@@ -3,7 +3,7 @@
   "version": "0.8.2",
   "description": "Always populate() certain fields in your mongoose schemas",
   "main": "index.js",
-  "homepage": "http://plugins.mongoosejs.io/plugins/autopopulate",
+  "homepage": "https://github.com/mongodb-js/mongoose-autopopulate",
   "scripts": {
     "docs": "acquit-markdown -r acquit-ignore -p ./test/integration.js > examples.md",
     "test": "mocha ./test/*.js",
@@ -26,7 +26,7 @@
     "acquit-markdown": "0.1.0",
     "co": "4.6.0",
     "mocha": "5.1.1",
-    "mongoose": "5.x",
+    "mongoose": "~5.3",
     "nyc": "11.7.3"
   },
   "peerDependencies": {
@@ -36,6 +36,5 @@
   "license": "Apache 2.0",
   "bugs": {
     "url": "https://github.com/mongodb-js/mongoose-autopopulate/issues"
-  },
-  "homepage": "https://github.com/mongodb-js/mongoose-autopopulate"
+  }
 }

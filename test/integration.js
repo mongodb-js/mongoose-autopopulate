@@ -18,9 +18,10 @@ describe('mongoose-autopopulate plugin', function() {
     var personSchema = new Schema({ name: String, birthName: String });
     var bandSchema = new Schema({
       name: String,
-      lead: { type: ObjectId, ref: 'people' },
+      lead: { type: ObjectId, ref: 'people', autopopulate: true },
       members: [{ type: ObjectId, ref: 'people', autopopulate: true }]
     });
+    bandSchema.plugin(autopopulate);
     Person = mongoose.model('people', personSchema, 'people');
     Band = mongoose.model('band', bandSchema, 'bands');
 
@@ -245,6 +246,28 @@ describe('mongoose-autopopulate plugin', function() {
       assert.ok(r.user.friends[0] instanceof mongoose.Types.ObjectId);
       // acquit:ignore:end
     });
+  });
+
+  /**
+   *  Setting the [Mongoose `lean` option](https://mongoosejs.com/docs/api.html#query_Query-lean)
+   *  will disable autopopulate for all paths, _unless_ you add `autopulate: true`
+   *  to your `lean` option.
+   */
+
+  it('with `lean()`', function() {
+    // acquit:ignore:start
+    return co(function*() {
+      // acquit:ignore:end
+      let band = yield Band.findOne().lean();
+      // Won't autopopulate because `lean()` is set
+      assert.ok(band.lead instanceof mongoose.Types.ObjectId);
+
+      // To turn on `autopopulate` with lean, use `lean({ autopulate: true })`
+      band = yield Band.findOne().lean({ autopopulate: true });
+      assert.equal(band.lead.name, 'Axl Rose');
+      // acquit:ignore:start
+    });
+    // acquit:ignore:end
   });
 
   /**
