@@ -254,7 +254,7 @@ describe('mongoose-autopopulate plugin', function() {
    *  to your `lean` option.
    */
 
-  it('with `lean()`', function() {
+  it('requires an option to work with lean', function() {
     // acquit:ignore:start
     return co(function*() {
       // acquit:ignore:end

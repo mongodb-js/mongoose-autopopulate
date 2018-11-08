@@ -208,7 +208,7 @@ return co(function*() {
 });
 ```
 
-## It with `lean()`
+## It requires an option to work with lean
 
 
 Setting the [Mongoose `lean` option](https://mongoosejs.com/docs/api.html#query_Query-lean)
