@@ -136,7 +136,7 @@ describe('mongoose-autopopulate plugin', function() {
    *  in your projection, or set the [`selectPopulatedPaths` schema option](https://mongoosejs.com/docs/guide.html#selectPopulatedPaths)
    *  to `false`.
    */
-  it('projections', function*() {
+  it('has a couple caveats with projections', function*() {
     // Mongoose adds `members: 1` and `lead: 1` to the projection
     let band = yield Band.findOne().select({ name: 1 });
     assert.equal(band.members[0].name, 'Axl Rose');

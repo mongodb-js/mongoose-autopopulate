@@ -78,6 +78,34 @@ Band.findOne({ name: "Guns N' Roses" }, function(error, doc) {
 });
 ```
 
+## It has a couple caveats with projections
+
+
+By default, Mongoose 5.x automatically projects in populated properties.
+That means you need a little extra work to exclude autopopulated fields.
+Either explicitly [deselect the path](https://mongoosejs.com/docs/api.html#query_Query-select)
+in your projection, or set the [`selectPopulatedPaths` schema option](https://mongoosejs.com/docs/guide.html#selectPopulatedPaths)
+to `false`.
+
+
+```javascript
+// Mongoose adds `members: 1` and `lead: 1` to the projection
+let band = yield Band.findOne().select({ name: 1 });
+assert.equal(band.members[0].name, 'Axl Rose');
+assert.equal(band.lead.name, 'Axl Rose');
+
+// You can also tell Mongoose to not project in populated paths by default
+// using the `selectPopulatedPaths` schema option.
+const newSchema = Band.schema.clone();
+
+newSchema.options.selectPopulatedPaths = false;
+let Band2 = mongoose.model('Band2', newSchema, 'bands');
+
+band = yield Band2.findOne().select({ name: 1 });
+assert.ok(!band.members);
+assert.ok(!band.lead);
+```
+
 ## It can specify an options argument
 
 

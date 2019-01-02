@@ -1,3 +1,7 @@
+0.9.1 / 2019-01-02
+==================
+ * docs: add note about selectPopulatedPaths option #50
+
 0.9.0 / 2018-11-08
 ==================
  * feat: support turning on autopopulate with lean #48 #27 #14
