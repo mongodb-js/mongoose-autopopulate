@@ -8,12 +8,16 @@ const mongoose = require('mongoose');
 const Schema = mongoose.Schema;
 const ObjectId = mongoose.Schema.Types.ObjectId;
 
+require('co-mocha')(require('mocha'));
+
 describe('mongoose-autopopulate plugin', function() {
   var Band;
   var Person;
 
   before(function(done) {
-    mongoose.connect('mongodb://localhost:27017/autopopulate');
+    mongoose.connect('mongodb://localhost:27017/autopopulate', {
+      useNewUrlParser: true
+    });
 
     var personSchema = new Schema({ name: String, birthName: String });
     var bandSchema = new Schema({
@@ -32,9 +36,9 @@ describe('mongoose-autopopulate plugin', function() {
 
     var gnr = { name: "Guns N' Roses" };
 
-    Person.remove({}, function(error) {
+    Person.deleteMany({}, function(error) {
       assert.ifError(error);
-      Band.remove({}, function(error) {
+      Band.deleteMany({}, function(error) {
         assert.ifError(error);
         Person.create(axl, function(error, doc) {
           assert.ifError(error);
@@ -123,6 +127,31 @@ describe('mongoose-autopopulate plugin', function() {
       assert.equal('William Bruce Rose, Jr.', doc.members[0].birthName);
       done();
     });
+  });
+
+  /**
+   *  By default, Mongoose 5.x automatically projects in populated properties.
+   *  That means you need a little extra work to exclude autopopulated fields.
+   *  Either explicitly [deselect the path](https://mongoosejs.com/docs/api.html#query_Query-select)
+   *  in your projection, or set the [`selectPopulatedPaths` schema option](https://mongoosejs.com/docs/guide.html#selectPopulatedPaths)
+   *  to `false`.
+   */
+  it('projections', function*() {
+    // Mongoose adds `members: 1` and `lead: 1` to the projection
+    let band = yield Band.findOne().select({ name: 1 });
+    assert.equal(band.members[0].name, 'Axl Rose');
+    assert.equal(band.lead.name, 'Axl Rose');
+
+    // You can also tell Mongoose to not project in populated paths by default
+    // using the `selectPopulatedPaths` schema option.
+    const newSchema = Band.schema.clone();
+
+    newSchema.options.selectPopulatedPaths = false;
+    let Band2 = mongoose.model('Band2', newSchema, 'bands');
+
+    band = yield Band2.findOne().select({ name: 1 });
+    assert.ok(!band.members);
+    assert.ok(!band.lead);
   });
 
   /**

@@ -25,6 +25,7 @@
     "acquit-ignore": "0.0.3",
     "acquit-markdown": "0.1.0",
     "co": "4.6.0",
+    "co-mocha": "1.2.2",
     "mocha": "5.1.1",
     "mongoose": "~5.3",
     "nyc": "11.7.3"
