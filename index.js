@@ -36,7 +36,7 @@ module.exports = function(schema) {
     });
   }
 
-  var autopopulateHandler = function() {
+  const autopopulateHandler = function(filter) {
     if (this._mongooseOptions &&
         this._mongooseOptions.lean &&
         // If lean and user didn't explicitly do `lean({ autopulate: true })`,
@@ -58,6 +58,9 @@ module.exports = function(schema) {
     const numPaths = pathsToPopulate.length;
     for (let i = 0; i < numPaths; ++i) {
       pathsToPopulate[i].options = pathsToPopulate[i].options || {};
+      if (typeof filter === 'function' && !filter(pathsToPopulate[i].options)) {
+        continue;
+      }
       pathsToPopulate[i].options.options = pathsToPopulate[i].options.options || {};
       Object.assign(pathsToPopulate[i].options.options, { _depth: depth + 1 });
       processOption.call(this,
@@ -66,9 +69,23 @@ module.exports = function(schema) {
   };
 
   schema.
-    pre('find', autopopulateHandler).
-    pre('findOne', autopopulateHandler).
-    pre('findOneAndUpdate', autopopulateHandler);
+    pre('find', function() { return autopopulateHandler.call(this); }).
+    pre('findOne', function() { return autopopulateHandler.call(this); }).
+    pre('findOneAndUpdate', function() { return autopopulateHandler.call(this); }).
+    post('save', function() {
+      if (pathsToPopulate.length < 0) {
+        return Promise.resolve();
+      }
+      autopopulateHandler.call(this, options => {
+        const pop = this.populated(options.path);
+        if (pop != null) {
+          return Array.isArray(pop) && pop.length !== this.get(options.path).length;
+        }
+        return true;
+      });
+
+      return this.execPopulate();
+    });
 };
 
 function defaultOptions(pathname, v) {

@@ -120,4 +120,59 @@ describe('bug fixes', function() {
       yield Mapping.findOne();
     });
   });
+
+  it('populate unpopulated paths after save() (gh-53)', function() {
+    const Person = db.model('gh53_Person', mongoose.Schema({ name: String }));
+    const schema = mongoose.Schema({
+      name: String,
+      people: [{ type: mongoose.ObjectId, ref: 'gh53_Person', autopopulate: true }]
+    });
+    schema.plugin(autopopulate);
+    const Group = db.model('gh53_Group', schema);
+
+    return co(function*() {
+      yield Person.deleteMany({});
+      yield Group.deleteMany({});
+
+      const luke = yield Person.create({ name: 'Luke Skywalker' });
+      const obiwan = yield Person.create({ name: 'Obi Wan Kenobi' });
+      yield Group.create({ name: 'Jedi Order', people: [luke._id] });
+
+      const doc = yield Group.findOne().populate('people');
+      assert.equal(doc.people[0].name, 'Luke Skywalker');
+
+      doc.people.push(obiwan._id);
+      const res = yield doc.save();
+
+      assert.equal(res.people[0].name, 'Luke Skywalker');
+      assert.equal(res.people[1].name, 'Obi Wan Kenobi');
+    });
+  });
+
+  it('skips post save populate if unnecessary (gh-53)', function() {
+    const Person = db.model('gh53_Person_2', mongoose.Schema({ name: String }));
+    const schema = mongoose.Schema({
+      name: String,
+      people: [{ type: mongoose.ObjectId, ref: 'gh53_Person_2', autopopulate: true }]
+    });
+    schema.plugin(autopopulate);
+    const Group = db.model('gh53_Group_2', schema);
+
+    return co(function*() {
+      yield Person.deleteMany({});
+      yield Group.deleteMany({});
+
+      const obiwan = yield Person.create({ name: 'Obi Wan Kenobi' });
+      yield Group.create({ name: 'Jedi Order', people: [obiwan._id] });
+
+      const doc = yield Group.findOne().populate('people');
+      assert.equal(doc.people[0].name, 'Obi Wan Kenobi');
+
+      yield Person.updateOne({ name: 'Obi Wan Kenobi' }, { name: 'Ben Kenobi' });
+
+      const res = yield doc.save();
+
+      assert.equal(res.people[0].name, 'Obi Wan Kenobi');
+    });
+  });
 });

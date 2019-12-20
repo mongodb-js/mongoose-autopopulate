@@ -171,6 +171,11 @@ function createSchemaStub(paths) {
     return schemaStub;
   };
   schemaStub.pre.calls = [];
+  schemaStub.post = function(func, handler) {
+    schemaStub.post.calls.push({ func: func, handler: handler });
+    return schemaStub;
+  };
+  schemaStub.post.calls = [];
   schemaStub.eachPath = function(handler) {
     paths.forEach(function(path) {
       handler(path.name, path.options);
