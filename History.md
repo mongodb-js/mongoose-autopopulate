@@ -1,3 +1,7 @@
+0.10.0 / 2019-12-20
+===================
+ * feat: autopopulate paths after `save()` if they aren't already populated #8
+
 0.9.1 / 2019-01-02
 ==================
  * docs: add note about selectPopulatedPaths option #50
