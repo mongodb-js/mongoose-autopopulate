@@ -50,7 +50,12 @@ module.exports = function(schema) {
       return;
     }
 
+    if (options.autopopulate && options.autopopulate.maxDepth) {
+    	options.maxDepth = options.autopopulate.maxDepth;
+    }
+
     const depth = options._depth != null ? options._depth : 0;
+
     if (options.maxDepth > 0 && depth >= options.maxDepth) {
       return;
     }
@@ -62,7 +67,11 @@ module.exports = function(schema) {
         continue;
       }
       pathsToPopulate[i].options.options = pathsToPopulate[i].options.options || {};
-      Object.assign(pathsToPopulate[i].options.options, { _depth: depth + 1 });
+
+      const newOptions = { _depth: depth + 1 }
+      if (options.maxDepth) newOptions.maxDepth = options.maxDepth;
+      Object.assign(pathsToPopulate[i].options.options, newOptions);
+
       processOption.call(this,
         pathsToPopulate[i].autopopulate, pathsToPopulate[i].options);
     }
