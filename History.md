@@ -1,3 +1,7 @@
+0.11.0 / 2020-01-24
+===================
+ * feat: allow override of maxDepth param via query options #62 [jmikrut](https://github.com/jmikrut)
+
 0.10.0 / 2019-12-20
 ===================
  * feat: autopopulate paths after `save()` if they aren't already populated #8
