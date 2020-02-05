@@ -1,40 +1,7 @@
 'use strict';
 
-const mongoose = require('mongoose');
-
 module.exports = function(schema) {
-  const pathsToPopulate = [];
-
-  eachPathRecursive(schema, function(pathname, schemaType) {
-    let option;
-    if (schemaType.options && schemaType.options.autopopulate) {
-      option = schemaType.options.autopopulate;
-      pathsToPopulate.push({
-        options: defaultOptions(pathname, schemaType.options),
-        autopopulate: option
-      });
-    } else if (schemaType.options &&
-        schemaType.options.type &&
-        schemaType.options.type[0] &&
-        schemaType.options.type[0].autopopulate) {
-      option = schemaType.options.type[0].autopopulate;
-      pathsToPopulate.push({
-        options: defaultOptions(pathname, schemaType.options.type[0]),
-        autopopulate: option
-      });
-    }
-  });
-
-  if (schema.virtuals) {
-    Object.keys(schema.virtuals).forEach(function(pathname) {
-      if (schema.virtuals[pathname].options.autopopulate) {
-        pathsToPopulate.push({
-          options: defaultOptions(pathname, schema.virtuals[pathname].options),
-          autopopulate: schema.virtuals[pathname].options.autopopulate,
-        });
-      }
-    });
-  }
+  const pathsToPopulate = getPathsToPopulate(schema);
 
   const autopopulateHandler = function(filter) {
     if (this._mongooseOptions &&
@@ -72,8 +39,11 @@ module.exports = function(schema) {
       if (options.maxDepth) newOptions.maxDepth = options.maxDepth;
       Object.assign(pathsToPopulate[i].options.options, newOptions);
 
-      processOption.call(this,
+      const optionsToUse = processOption.call(this,
         pathsToPopulate[i].autopopulate, pathsToPopulate[i].options);
+      if (optionsToUse) {
+        this.populate(optionsToUse);
+      }
     }
   };
 
@@ -81,6 +51,9 @@ module.exports = function(schema) {
     pre('find', function() { return autopopulateHandler.call(this); }).
     pre('findOne', function() { return autopopulateHandler.call(this); }).
     pre('findOneAndUpdate', function() { return autopopulateHandler.call(this); }).
+    post('find', function(res) { return autopopulateDiscriminators.call(this, res) }).
+    post('findOne', function(res) { return autopopulateDiscriminators.call(this, res) }).
+    post('findOneAndUpdate', function(res) { return autopopulateDiscriminators.call(this, res) }).
     post('save', function() {
       if (pathsToPopulate.length < 0) {
         return Promise.resolve();
@@ -97,6 +70,85 @@ module.exports = function(schema) {
     });
 };
 
+function autopopulateDiscriminators(res) {
+  if (res == null) {
+    return;
+  }
+  if (this._mongooseOptions != null && this._mongooseOptions.lean) {
+    // If lean, we don't have a good way to figure out the discriminator
+    // schema, and so skip autopopulating.
+    return;
+  }
+  if (!Array.isArray(res)) {
+    res = [res];
+  }
+
+  const discriminators = new Map();
+  for (const doc of res) {
+    if (doc.constructor.baseModelName != null) {
+      const discriminatorModel = doc.constructor;
+      const modelName = discriminatorModel.modelName;
+
+      if (!discriminators.has(modelName)) {
+        const pathsToPopulate = getPathsToPopulate(discriminatorModel.schema).
+          filter(p => !doc.populated(p.options.path));
+
+        discriminators.set(modelName, {
+          model: discriminatorModel,
+          docs: [],
+          pathsToPopulate: pathsToPopulate
+        });
+      }
+      const modelMap = discriminators.get(modelName);
+      modelMap.docs.push(doc);
+    }
+  }
+
+  return Promise.all(Array.from(discriminators.values()).map(modelMap => {
+    const pathsToPopulate = modelMap.pathsToPopulate.
+      map(p => processOption.call(this, p.autopopulate, p.options)).
+      filter(v => !!v);
+    return modelMap.model.populate(modelMap.docs, pathsToPopulate);
+  }));
+}
+
+function getPathsToPopulate(schema) {
+  const pathsToPopulate = [];
+
+  eachPathRecursive(schema, function(pathname, schemaType) {
+    let option;
+    if (schemaType.options && schemaType.options.autopopulate) {
+      option = schemaType.options.autopopulate;
+      pathsToPopulate.push({
+        options: defaultOptions(pathname, schemaType.options),
+        autopopulate: option
+      });
+    } else if (schemaType.options &&
+        schemaType.options.type &&
+        schemaType.options.type[0] &&
+        schemaType.options.type[0].autopopulate) {
+      option = schemaType.options.type[0].autopopulate;
+      pathsToPopulate.push({
+        options: defaultOptions(pathname, schemaType.options.type[0]),
+        autopopulate: option
+      });
+    }
+  });
+
+  if (schema.virtuals) {
+    Object.keys(schema.virtuals).forEach(function(pathname) {
+      if (schema.virtuals[pathname].options.autopopulate) {
+        pathsToPopulate.push({
+          options: defaultOptions(pathname, schema.virtuals[pathname].options),
+          autopopulate: schema.virtuals[pathname].options.autopopulate,
+        });
+      }
+    });
+  }
+
+  return pathsToPopulate;
+}
+
 function defaultOptions(pathname, v) {
   const ret = { path: pathname, options: { maxDepth: 10 } };
   if (v.ref != null) {
@@ -112,20 +164,17 @@ function defaultOptions(pathname, v) {
 function processOption(value, options) {
   switch (typeof value) {
     case 'function':
-      handleFunction.call(this, value, options);
-      break;
+      return handleFunction.call(this, value, options);
     case 'object':
-      handleObject.call(this, value, options);
-      break;
+      return handleObject.call(this, value, options);
     default:
-      handlePrimitive.call(this, value, options);
-      break;
+      return handlePrimitive.call(this, value, options);
   }
 }
 
 function handlePrimitive(value, options) {
   if (value) {
-    this.populate(options);
+    return options;
   }
 }
 
@@ -137,12 +186,13 @@ function handleObject(value, optionsToUse) {
     delete value.maxDepth;
   }
   optionsToUse = Object.assign({}, optionsToUse, value);
-  this.populate(optionsToUse);
+
+  return optionsToUse;
 }
 
 function handleFunction(fn, options) {
   const val = fn.call(this, options);
-  processOption.call(this, val, options);
+  return processOption.call(this, val, options);
 }
 
 function mergeOptions(destination, source) {

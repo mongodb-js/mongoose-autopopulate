@@ -175,4 +175,31 @@ describe('bug fixes', function() {
       assert.equal(res.people[0].name, 'Obi Wan Kenobi');
     });
   });
+
+  it('autopopulates discriminators post find (gh-26)', function() {
+    const baseSchema = new Schema({ field: String });
+    baseSchema.plugin(autopopulate);
+
+    const childSchema = new Schema({
+      items: [{ type: Schema.Types.ObjectId, ref: 'gh26', autopopulate: true }]
+    });
+    childSchema.plugin(autopopulate);
+
+    const Base = db.model('gh26_Test', baseSchema);
+    const Child = Base.discriminator('gh26_Child', childSchema);
+    const ChildData = db.model('gh26', Schema({ name: String }));
+
+    return co(function*() {
+      const c = yield ChildData.create({ name: 'test' });
+      yield Child.create({ field: 'foo', items: [c._id] });
+    
+      const doc = yield Base.findOne();
+      assert.ok(doc instanceof Child);
+      assert.equal(doc.items[0].name, 'test');
+
+      const docs = yield Base.find();
+      assert.ok(docs[0] instanceof Child);
+      assert.equal(docs[0].items[0].name, 'test');
+    });
+  });
 });
