@@ -1,3 +1,7 @@
+0.12.0 / 2020-02-05
+===================
+ * feat: autopopulate discriminators post `find()`, `findOne()`, and `findOneAndUpdate()` #26
+
 0.11.0 / 2020-01-24
 ===================
  * feat: allow override of maxDepth param via query options #62 [jmikrut](https://github.com/jmikrut)
