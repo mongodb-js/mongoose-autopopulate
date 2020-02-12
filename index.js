@@ -55,7 +55,7 @@ module.exports = function(schema) {
     post('findOne', function(res) { return autopopulateDiscriminators.call(this, res) }).
     post('findOneAndUpdate', function(res) { return autopopulateDiscriminators.call(this, res) }).
     post('save', function() {
-      if (pathsToPopulate.length < 0) {
+      if (pathsToPopulate.length === 0) {
         return Promise.resolve();
       }
       autopopulateHandler.call(this, options => {
