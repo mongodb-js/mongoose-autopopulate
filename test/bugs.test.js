@@ -11,11 +11,24 @@ describe('bug fixes', function() {
   let db;
 
   before(function() {
-    db = mongoose.createConnection('mongodb://localhost:27017/autopopulate');
+    db = mongoose.createConnection('mongodb://localhost:27017/autopopulate', {
+      useUnifiedTopology: true,
+      useNewUrlParser: true
+    });
   });
 
   after(function(done) {
     db.close(done);
+  });
+
+  beforeEach(function() {
+    const promises = [];
+    for (const modelName of Object.keys(db.models)) {
+      const Model = db.model(modelName);
+      promises.push(Model.deleteMany({}));
+    }
+
+    return Promise.all(promises);
   });
 
   it('gh-15', function(done) {
@@ -200,6 +213,36 @@ describe('bug fixes', function() {
       const docs = yield Base.find();
       assert.ok(docs[0] instanceof Child);
       assert.equal(docs[0].items[0].name, 'test');
+    });
+  });
+
+  it('handles autopopulate in nested doc array when top-level array is empty (gh-70)', function() {
+    const User = db.model('User', Schema({ name: String }));
+    db.model('Card', Schema({ name: String }));
+    const GameSchema = new Schema({
+      players: [{
+        type: 'ObjectId',
+        ref: 'User',
+        autopopulate: true
+      }],
+      state: [{
+        cards: [{
+          card: { type: 'ObjectId', ref: 'Card', autopopulate: true }
+        }]
+      }]
+    });
+    GameSchema.plugin(autopopulate);
+    const Game = db.model('Game', GameSchema);
+
+    return co(function*() {
+      const player = yield User.create({ name: 'test' });
+      yield Game.create({ players: [], state: [] });
+
+      const doc = yield Game.findOne();
+      doc.players.push(player._id);
+      yield doc.save();
+
+      assert.deepEqual(doc.toObject().state, []);
     });
   });
 });

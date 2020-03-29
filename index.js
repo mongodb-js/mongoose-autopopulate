@@ -60,8 +60,9 @@ module.exports = function(schema) {
       }
       autopopulateHandler.call(this, options => {
         const pop = this.populated(options.path);
-        if (pop != null) {
-          return Array.isArray(pop) && pop.length !== this.get(options.path).length;
+        if (Array.isArray(pop)) {
+          const docVal = this.get(options.path);
+          return docVal == null || pop.length !== docVal.length;
         }
         return true;
       });
