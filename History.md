@@ -1,3 +1,7 @@
+0.12.1 / 2020-03-29
+===================
+ * fix: handle autopopulate within nested document array when top-level array is empty #70
+
 0.12.0 / 2020-02-05
 ===================
  * feat: autopopulate discriminators post `find()`, `findOne()`, and `findOneAndUpdate()` #26
