@@ -1,3 +1,8 @@
+0.12.2 / 2020-04-19
+===================
+ * fix: avoid error in post('save') handler when this plugin is registered on a child schema #10
+ * docs: explain that this plugin should only be registered on top-level schemas
+
 0.12.1 / 2020-03-29
 ===================
  * fix: handle autopopulate within nested document array when top-level array is empty #70
