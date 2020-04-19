@@ -58,6 +58,11 @@ module.exports = function(schema) {
       if (pathsToPopulate.length === 0) {
         return Promise.resolve();
       }
+      // Skip for subdocs, because we assume this function only runs on
+      // top-level documents.
+      if (typeof this.ownerDocument === 'function') {
+        return Promise.resolve();
+      }
       autopopulateHandler.call(this, options => {
         const pop = this.populated(options.path);
         if (Array.isArray(pop)) {
