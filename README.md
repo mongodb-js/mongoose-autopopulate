@@ -35,3 +35,15 @@ const schema = new mongoose.Schema({
 });
 schema.plugin(require('mongoose-autopopulate'));
 ```
+
+Only apply this plugin to top-level schemas. Don't apply this plugin to child schemas.
+
+```javascript
+// Don't do `nestedSchema.plugin(require('mongoose-autopopulate'))`.
+// You only need to add mongoose-autopopulate to top-level schemas.
+const nestedSchema = mongoose.Schema({
+  child: { type: Number, ref: 'Child', autopopulate: true }
+});
+const topSchema = mongoose.Schema({ nested: nestedSchema });
+topSchema.plugin(require('mongoose-autopopulate'));
+```
