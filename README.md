@@ -15,7 +15,7 @@ helps you get away with poor schema design.  In particular, it is usually
 bad MongoDB schema design to include arrays that grow without bound in
 your documents. Do not include a constantly-growing array of ObjectIds
 in your schema - your data will become unwieldy as the array grows and
-you will eventually hit the [16mb document size limit](http://docs.mongodb.org/manual/reference/limits/#BSON-Document-Size).
+you will eventually hit the [16 MB document size limit](http://docs.mongodb.org/manual/reference/limits/#BSON-Document-Size).
 In general, think carefully when designing your schemas.
 
 # Usage
