@@ -245,4 +245,37 @@ describe('bug fixes', function() {
       assert.deepEqual(doc.toObject().state, []);
     });
   });
+
+  it('autopopulates if pushing a subdocument with an unpopulated path onto a document array (gh-77)', function() {
+    const PopulatedSchema = Schema({ name: String });
+    const PopulatedModel = db.model('Test', PopulatedSchema);
+  
+    const ParentSchema = new mongoose.Schema({
+      entries: [{
+        name: String,
+        model: {
+          type: 'ObjectId',
+          ref: 'Test',
+          autopopulate: true
+        }
+      }]
+    });
+    ParentSchema.plugin(autopopulate);
+    const ParentModel = db.model('Parent', ParentSchema);
+
+    return co(function*() {
+      const populated = new PopulatedModel({ name: 'my test' });
+      yield populated.save();
+  
+      const doc = new ParentModel();
+      doc.entries.push({ model: populated._id });
+      yield doc.save();
+
+      doc.entries.push({ model: populated._id });
+      yield doc.save();
+
+      assert.equal(doc.entries[0].model.name, 'my test');
+      assert.equal(doc.entries[1].model.name, 'my test');
+    });
+  });
 });
