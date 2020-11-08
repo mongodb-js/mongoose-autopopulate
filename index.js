@@ -67,7 +67,9 @@ module.exports = function(schema) {
         const pop = this.populated(options.path);
         if (Array.isArray(pop)) {
           const docVal = this.get(options.path);
-          return docVal == null || pop.length !== docVal.length;
+          return docVal == null ||
+            pop.length !== docVal.length ||
+            pop.some(v => v == null);
         }
         return true;
       });
