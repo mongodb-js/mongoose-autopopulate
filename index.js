@@ -3,18 +3,9 @@
 module.exports = function(schema) {
   const pathsToPopulate = getPathsToPopulate(schema);
 
-  const autopopulateHandler = function(filter) {
-    if (this._mongooseOptions &&
-        this._mongooseOptions.lean &&
-        // If lean and user didn't explicitly do `lean({ autopulate: true })`,
-        // skip it. See gh-27, gh-14, gh-48
-        !this._mongooseOptions.lean.autopopulate) {
-      return;
-    }
-
-    const options = this.options || {};
+  function _autopopulateHandler(options, filter) {
     if (options.autopopulate === false) {
-      return;
+      return [];
     }
 
     if (options.autopopulate && options.autopopulate.maxDepth) {
@@ -24,8 +15,10 @@ module.exports = function(schema) {
     const depth = options._depth != null ? options._depth : 0;
 
     if (options.maxDepth > 0 && depth >= options.maxDepth) {
-      return;
+      return [];
     }
+
+    const toPopulate = [];
 
     const numPaths = pathsToPopulate.length;
     for (let i = 0; i < numPaths; ++i) {
@@ -42,8 +35,26 @@ module.exports = function(schema) {
       const optionsToUse = processOption.call(this,
         pathsToPopulate[i].autopopulate, pathsToPopulate[i].options);
       if (optionsToUse) {
-        this.populate(optionsToUse);
+        toPopulate.push(optionsToUse);
       }
+    }
+
+    return toPopulate;
+  }
+
+  const autopopulateHandler = function(filter) {
+    if (this._mongooseOptions &&
+        this._mongooseOptions.lean &&
+        // If lean and user didn't explicitly do `lean({ autopulate: true })`,
+        // skip it. See gh-27, gh-14, gh-48
+        !this._mongooseOptions.lean.autopopulate) {
+      return;
+    }
+
+    const options = this.options || {};
+    const toPopulate = _autopopulateHandler(options, filter);
+    for (const pop of toPopulate) {
+      this.populate(pop);
     }
   };
 
@@ -68,6 +79,14 @@ module.exports = function(schema) {
       });
 
       return this.execPopulate();
+    }).
+    pre('insertMany', function(next, docs, options) {
+      options = options || {};
+      const toPopulate = _autopopulateHandler(options);
+      if (toPopulate.length > 0) {
+        options.populate = toPopulate;
+      }
+      next();
     });
 };
 

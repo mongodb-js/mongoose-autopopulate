@@ -245,4 +245,32 @@ describe('bug fixes', function() {
       assert.deepEqual(doc.toObject().state, []);
     });
   });
+
+  it('supports insertMany (gh-79)', function() {
+    const User = db.model('User', Schema({ name: String }));
+    const GameSchema = new Schema({
+      players: [{
+        type: 'ObjectId',
+        ref: 'User',
+        autopopulate: true
+      }]
+    });
+    GameSchema.plugin(autopopulate);
+    const Game = db.model('Game', GameSchema);
+
+    return co(function*() {
+      const player = yield User.create({ name: 'test' });
+      let docs = yield Game.insertMany([{ players: [player._id] }], {});
+
+      assert.equal(docs.length, 1);
+      assert.equal(docs[0].players.length, 1);
+      assert.equal(docs[0].players[0].name, 'test');
+
+      docs = yield Game.insertMany([{ players: [player._id] }], { autopopulate: false });
+
+      assert.equal(docs.length, 1);
+      assert.equal(docs[0].players.length, 1);
+      assert.equal(docs[0].players[0].toHexString(), player._id.toHexString());
+    });
+  });
 });
