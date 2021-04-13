@@ -203,14 +203,6 @@ function handleFunction(fn, options) {
   return processOption.call(this, val, options);
 }
 
-function mergeOptions(destination, source) {
-  const keys = Object.keys(source);
-  const numKeys = keys.length;
-  for (let i = 0; i < numKeys; ++i) {
-    destination[keys[i]] = source[keys[i]];
-  }
-}
-
 function eachPathRecursive(schema, handler, path) {
   if (!path) {
     path = [];
@@ -219,6 +211,12 @@ function eachPathRecursive(schema, handler, path) {
     path.push(pathname);
     if (schemaType.schema) {
       eachPathRecursive(schemaType.schema, handler, path);
+
+      if (schemaType.schema.discriminators != null) {
+        for (const discriminatorName of Object.keys(schemaType.schema.discriminators)) {
+          eachPathRecursive(schemaType.schema.discriminators[discriminatorName], handler, path);
+        }
+      }
     } else {
       handler(path.join('.'), schemaType);
     }

@@ -278,4 +278,41 @@ describe('bug fixes', function() {
       assert.equal(doc.entries[1].model.name, 'my test');
     });
   });
+
+  it('autopopulates embedded discriminator (gh-82)', function() {
+    const enemySchema = new Schema({
+      name: String,
+      level: Number
+    });
+    const Enemy = db.model('Enemy', enemySchema);
+  
+    const mapSchema = new Schema({
+      tiles: [new Schema({}, { discriminatorKey: 'kind', _id: false })]
+    });
+  
+    const contentPath = mapSchema.path('tiles');
+  
+    contentPath.discriminator('Enemy', new Schema({
+      enemy: { type: Schema.Types.ObjectId, ref: 'Enemy', autopopulate: true }
+    }));
+    contentPath.discriminator('Wall', new Schema({ color: String }));
+    mapSchema.plugin(autopopulate);
+
+    const Map = db.model('Map', mapSchema);
+
+    return co(function*() {
+      const e = yield Enemy.create({
+        name: 'Bowser',
+        level: 10
+      });
+    
+      let map = yield Map.create({
+        tiles: [{ kind: 'Enemy', enemy: e._id }, { kind: 'Wall', color: 'Blue' }]
+      });
+    
+      map = yield Map.findById(map);
+      assert.equal(map.tiles[0].enemy.name, 'Bowser');
+      assert.equal(map.tiles[1].color, 'Blue');
+    });
+  });
 });
