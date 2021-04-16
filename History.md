@@ -1,3 +1,8 @@
+0.13.0 / 2021-04-15
+===================
+ * fix: autopopulate nested array fields containing embedded discriminator #82
+ * feat: autopopulate embedded discriminators #82
+
 0.12.2 / 2020-04-19
 ===================
  * fix: avoid error in post('save') handler when this plugin is registered on a child schema #10
