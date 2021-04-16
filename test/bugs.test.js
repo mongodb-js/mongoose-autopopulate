@@ -287,7 +287,7 @@ describe('bug fixes', function() {
     const Enemy = db.model('Enemy', enemySchema);
   
     const mapSchema = new Schema({
-      tiles: [new Schema({}, { discriminatorKey: 'kind', _id: false })]
+      tiles: [[new Schema({}, { discriminatorKey: 'kind', _id: false })]]
     });
   
     const contentPath = mapSchema.path('tiles');
@@ -307,12 +307,13 @@ describe('bug fixes', function() {
       });
     
       let map = yield Map.create({
-        tiles: [{ kind: 'Enemy', enemy: e._id }, { kind: 'Wall', color: 'Blue' }]
+        tiles: [[{ kind: 'Enemy', enemy: e._id }, { kind: 'Wall', color: 'Blue' }]]
       });
     
       map = yield Map.findById(map);
-      assert.equal(map.tiles[0].enemy.name, 'Bowser');
-      assert.equal(map.tiles[1].color, 'Blue');
+      console.log(map.tiles)
+      assert.equal(map.tiles[0][0].enemy.name, 'Bowser');
+      assert.equal(map.tiles[0][1].color, 'Blue');
     });
   });
 });

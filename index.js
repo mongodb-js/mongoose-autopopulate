@@ -217,6 +217,19 @@ function eachPathRecursive(schema, handler, path) {
           eachPathRecursive(schemaType.schema.discriminators[discriminatorName], handler, path);
         }
       }
+    } else if (schemaType.$isMongooseArray && schemaType.$embeddedSchemaType.$isMongooseArray) {
+      while (schemaType != null && schemaType.$isMongooseArray && !schemaType.$isMongooseDocumentArray) {
+        schemaType = schemaType.$embeddedSchemaType;
+      }
+      if (schemaType != null && schemaType.$isMongooseDocumentArray) {
+        eachPathRecursive(schemaType.schema, handler, path);
+
+        if (schemaType.schema.discriminators != null) {
+          for (const discriminatorName of Object.keys(schemaType.schema.discriminators)) {
+            eachPathRecursive(schemaType.schema.discriminators[discriminatorName], handler, path);
+          }
+        }
+      }
     } else {
       handler(path.join('.'), schemaType);
     }

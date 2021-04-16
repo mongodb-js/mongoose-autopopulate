@@ -27,11 +27,11 @@
     "co": "4.6.0",
     "co-mocha": "1.2.2",
     "mocha": "5.1.1",
-    "mongoose": "5.x",
+    "mongoose": ">= 5.12.4",
     "nyc": "11.7.3"
   },
   "peerDependencies": {
-    "mongoose": "4.x || 5.x"
+    "mongoose": ">= 5.12.4"
   },
   "author": "Valeri Karpov <val@karpov.io>",
   "license": "Apache 2.0",
