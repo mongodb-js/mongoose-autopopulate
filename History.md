@@ -1,3 +1,7 @@
+0.14.0 / 2021-05-14
+===================
+ * feat: add `functions` option to list out functions to register hooks on
+
 0.13.0 / 2021-04-15
 ===================
  * fix: autopopulate nested array fields containing embedded discriminator #82
