@@ -337,4 +337,34 @@ describe('mongoose-autopopulate plugin', function() {
         slash._id.toHexString());
     });
   });
+
+  /**
+   *  By default, autopopulate applies to the results of `find()`, `findOne()`,
+   *  `findOneAndUpdate()`, and `save()`. You can pick which functions
+   *  you want autopopulate to handle using the `functions` option. For example,
+   *  the below code disables autopopulating on `save()`.
+   */
+  it('can pass a list or regular expression of functions to apply hooks to', function() {
+    return co(function*() {
+      const bandSchema = new Schema({
+        name: String,
+        lead: { type: ObjectId, ref: 'people', autopopulate: true }
+      });
+      bandSchema.plugin(autopopulate, {
+        // Apply this plugin to all functions except for `save()`
+        functions: ['find', 'findOne', 'findOneAndUpdate']
+      });
+  
+      const Band = mongoose.model('band8', bandSchema, 'bands');
+
+      let band = yield Band.findOne({ name: "Guns N' Roses" });
+      assert.ok(band.populated('lead'));
+
+      band = yield Band.findOne({ name: "Guns N' Roses" }).setOptions({ autopopulate: false });
+      assert.ok(!band.populated('lead'));
+      // `save()` doesn't autopopulate
+      yield band.save();
+      assert.ok(!band.populated('lead'));
+    });
+  });
 });

@@ -1,7 +1,19 @@
 'use strict';
 
-module.exports = function(schema) {
+module.exports = function autopopulatePlugin(schema, options) {
   const pathsToPopulate = getPathsToPopulate(schema);
+
+  let testFunction = () => true;
+  if (options != null && (Array.isArray(options.functions) || options.functions instanceof RegExp)) {
+    let _functions = options.functions;
+    if (Array.isArray(_functions)) {
+      _functions = new Set(_functions);
+
+      testFunction = v => _functions.has(v);
+    } else {
+      testFunction = v => _functions.test(v);
+    }
+  }
 
   const autopopulateHandler = function(filter) {
     if (this._mongooseOptions &&
@@ -47,14 +59,20 @@ module.exports = function(schema) {
     }
   };
 
-  schema.
-    pre('find', function() { return autopopulateHandler.call(this); }).
-    pre('findOne', function() { return autopopulateHandler.call(this); }).
-    pre('findOneAndUpdate', function() { return autopopulateHandler.call(this); }).
-    post('find', function(res) { return autopopulateDiscriminators.call(this, res) }).
-    post('findOne', function(res) { return autopopulateDiscriminators.call(this, res) }).
-    post('findOneAndUpdate', function(res) { return autopopulateDiscriminators.call(this, res) }).
-    post('save', function() {
+  if (testFunction('find')) {
+    schema.pre('find', function() { return autopopulateHandler.call(this); });
+    schema.post('find', function(res) { return autopopulateDiscriminators.call(this, res) });
+  }
+  if (testFunction('findOne')) {
+    schema.pre('findOne', function() { return autopopulateHandler.call(this); });
+    schema.post('findOne', function(res) { return autopopulateDiscriminators.call(this, res) });
+  }
+  if (testFunction('findOneAndUpdate')) {
+    schema.pre('findOneAndUpdate', function() { return autopopulateHandler.call(this); });
+    schema.post('findOneAndUpdate', function(res) { return autopopulateDiscriminators.call(this, res) });
+  }
+  if (testFunction('save')) {
+    schema.post('save', function() {
       if (pathsToPopulate.length === 0) {
         return Promise.resolve();
       }
@@ -75,7 +93,8 @@ module.exports = function(schema) {
       });
 
       return this.execPopulate();
-    });
+    }); 
+  }
 };
 
 function autopopulateDiscriminators(res) {
