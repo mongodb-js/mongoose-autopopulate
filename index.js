@@ -2,6 +2,7 @@
 
 module.exports = function autopopulatePlugin(schema, options) {
   const pathsToPopulate = getPathsToPopulate(schema);
+  let finalPaths;
 
   let testFunction = () => true;
   if (options != null && (Array.isArray(options.functions) || options.functions instanceof RegExp)) {
@@ -54,7 +55,7 @@ module.exports = function autopopulatePlugin(schema, options) {
       const optionsToUse = processOption.call(this,
         pathsToPopulate[i].autopopulate, pathsToPopulate[i].options);
       if (optionsToUse) {
-        this.populate(optionsToUse);
+        finalPaths = optionsToUse;
       }
     }
   };
@@ -92,8 +93,8 @@ module.exports = function autopopulatePlugin(schema, options) {
         return true;
       });
 
-      return this.execPopulate();
-    }); 
+      return this.populate(finalPaths);
+    });
   }
 };
 
