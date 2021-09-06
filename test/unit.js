@@ -1,15 +1,16 @@
-var plugin = require('../');
-var assert = require('assert');
+'use strict';
+
+const plugin = require('../');
+const assert = require('assert');
 
 describe('mongoose-autopopulate:unit', function() {
-  var schemaStub;
-  var queryStub;
-  var paths = [];
+  let schemaStub;
+  let paths = [];
 
   it('populates when paths autopopulate option is true', function() {
     paths = [{ name: 'test', options: { options: { autopopulate: true } } }];
     schemaStub = createSchemaStub(paths);
-    var p = plugin(schemaStub);
+    plugin(schemaStub);
     assert.equal(schemaStub.pre.calls.length, 3);
 
     const pathsToPopulate = schemaStub.pre.calls[0].handler.call({});
@@ -24,7 +25,7 @@ describe('mongoose-autopopulate:unit', function() {
       { name: 'test3', options: { options: { autopopulate: null } } }
     ];
     schemaStub = createSchemaStub(paths);
-    var p = plugin(schemaStub);
+    plugin(schemaStub);
     assert.equal(schemaStub.pre.calls.length, 3);
 
     const pathsToPopulate = schemaStub.pre.calls[0].handler.call({});
@@ -41,11 +42,11 @@ describe('mongoose-autopopulate:unit', function() {
             autopopulate: { select: 'name' }
           }
         }
-      },
+      }
     ];
     schemaStub = createSchemaStub(paths);
 
-    var p = plugin(schemaStub);
+    plugin(schemaStub);
     assert.equal(schemaStub.pre.calls.length, 3);
 
     const pathsToPopulate = schemaStub.pre.calls[0].handler.call({});
@@ -65,10 +66,10 @@ describe('mongoose-autopopulate:unit', function() {
             }
           }
         }
-      },
+      }
     ];
     schemaStub = createSchemaStub(paths);
-    var p = plugin(schemaStub);
+    plugin(schemaStub);
     assert.equal(schemaStub.pre.calls.length, 3);
 
     const pathsToPopulate = schemaStub.pre.calls[0].handler.call({});
@@ -87,11 +88,11 @@ describe('mongoose-autopopulate:unit', function() {
             }
           }
         }
-      },
+      }
     ];
     schemaStub = createSchemaStub(paths);
 
-    var p = plugin(schemaStub);
+    plugin(schemaStub);
     assert.equal(schemaStub.pre.calls.length, 3);
 
     const pathsToPopulate = schemaStub.pre.calls[0].handler.call({});
@@ -111,10 +112,10 @@ describe('mongoose-autopopulate:unit', function() {
             }
           }
         }
-      },
+      }
     ];
     schemaStub = createSchemaStub(paths);
-    var p = plugin(schemaStub);
+    plugin(schemaStub);
     assert.equal(schemaStub.pre.calls.length, 3);
 
     const pathsToPopulate = schemaStub.pre.calls[0].handler.call({});
@@ -122,7 +123,7 @@ describe('mongoose-autopopulate:unit', function() {
   });
 
   it('handles nested schemas', function() {
-    var nestedPath = {
+    const nestedPath = {
       name: 'test',
       options: {
         options: {
@@ -131,16 +132,16 @@ describe('mongoose-autopopulate:unit', function() {
       }
     };
 
-    var topLevel = {
+    const topLevel = {
       name: 'nested',
       options: {
         schema: createSchemaStub([nestedPath])
       }
     };
 
-    var schema = createSchemaStub([topLevel]);
+    const schema = createSchemaStub([topLevel]);
 
-    var p = plugin(schema);
+    plugin(schema);
     assert.equal(schema.pre.calls.length, 3);
 
     const pathsToPopulate = schema.pre.calls[0].handler.call({});
@@ -150,7 +151,7 @@ describe('mongoose-autopopulate:unit', function() {
 });
 
 function createSchemaStub(paths) {
-  schemaStub = {};
+  const schemaStub = {};
   schemaStub.pre = function(func, handler) {
     schemaStub.pre.calls.push({ func: func, handler: handler });
     return schemaStub;

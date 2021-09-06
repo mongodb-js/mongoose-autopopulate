@@ -32,7 +32,7 @@ module.exports = function autopopulatePlugin(schema, options) {
     }
 
     if (options.autopopulate && options.autopopulate.maxDepth) {
-    	options.maxDepth = options.autopopulate.maxDepth;
+      options.maxDepth = options.autopopulate.maxDepth;
     }
 
     const depth = options._depth != null ? options._depth : 0;
@@ -49,7 +49,7 @@ module.exports = function autopopulatePlugin(schema, options) {
       }
       pathsToPopulate[i].options.options = pathsToPopulate[i].options.options || {};
 
-      const newOptions = { _depth: depth + 1 }
+      const newOptions = { _depth: depth + 1 };
       if (options.maxDepth) newOptions.maxDepth = options.maxDepth;
       Object.assign(pathsToPopulate[i].options.options, newOptions);
 
@@ -71,15 +71,15 @@ module.exports = function autopopulatePlugin(schema, options) {
 
   if (testFunction('find')) {
     schema.pre('find', function() { return autopopulateHandler.call(this); });
-    schema.post('find', function(res) { return autopopulateDiscriminators.call(this, res) });
+    schema.post('find', function(res) { return autopopulateDiscriminators.call(this, res); });
   }
   if (testFunction('findOne')) {
     schema.pre('findOne', function() { return autopopulateHandler.call(this); });
-    schema.post('findOne', function(res) { return autopopulateDiscriminators.call(this, res) });
+    schema.post('findOne', function(res) { return autopopulateDiscriminators.call(this, res); });
   }
   if (testFunction('findOneAndUpdate')) {
     schema.pre('findOneAndUpdate', function() { return autopopulateHandler.call(this); });
-    schema.post('findOneAndUpdate', function(res) { return autopopulateDiscriminators.call(this, res) });
+    schema.post('findOneAndUpdate', function(res) { return autopopulateDiscriminators.call(this, res); });
   }
   if (testFunction('save')) {
     schema.post('save', function() {
@@ -176,7 +176,7 @@ function getPathsToPopulate(schema) {
       if (schema.virtuals[pathname].options.autopopulate) {
         pathsToPopulate.push({
           options: defaultOptions(pathname, schema.virtuals[pathname].options),
-          autopopulate: schema.virtuals[pathname].options.autopopulate,
+          autopopulate: schema.virtuals[pathname].options.autopopulate
         });
       }
     });

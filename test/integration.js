@@ -11,16 +11,16 @@ const ObjectId = mongoose.Schema.Types.ObjectId;
 require('co-mocha')(require('mocha'));
 
 describe('mongoose-autopopulate plugin', function() {
-  var Band;
-  var Person;
+  let Band;
+  let Person;
 
   before(function(done) {
     mongoose.connect('mongodb://localhost:27017/autopopulate', {
       useNewUrlParser: true
     });
 
-    var personSchema = new Schema({ name: String, birthName: String });
-    var bandSchema = new Schema({
+    const personSchema = new Schema({ name: String, birthName: String });
+    const bandSchema = new Schema({
       name: String,
       lead: { type: ObjectId, ref: 'people', autopopulate: true },
       members: [{ type: ObjectId, ref: 'people', autopopulate: true }]
@@ -29,12 +29,12 @@ describe('mongoose-autopopulate plugin', function() {
     Person = mongoose.model('people', personSchema, 'people');
     Band = mongoose.model('band', bandSchema, 'bands');
 
-    var axl = {
+    const axl = {
       name: 'Axl Rose',
       birthName: 'William Bruce Rose, Jr.'
     };
 
-    var gnr = { name: "Guns N' Roses" };
+    const gnr = { name: 'Guns N\' Roses' };
 
     Person.deleteMany({}, function(error) {
       assert.ifError(error);
@@ -95,14 +95,14 @@ describe('mongoose-autopopulate plugin', function() {
    *  for you.
    */
   it('supports an autopopulate option in schemas', function(done) {
-    var bandSchema = new Schema({
+    const bandSchema = new Schema({
       name: String,
       lead: { type: ObjectId, ref: 'people', autopopulate: true }
     });
     bandSchema.plugin(autopopulate);
 
-    var Band = mongoose.model('band3', bandSchema, 'bands');
-    Band.findOne({ name: "Guns N' Roses" }, function(error, doc) {
+    const Band = mongoose.model('band3', bandSchema, 'bands');
+    Band.findOne({ name: 'Guns N\' Roses' }, function(error, doc) {
       assert.ifError(error);
       assert.equal('Axl Rose', doc.lead.name);
       assert.equal('William Bruce Rose, Jr.', doc.lead.birthName);
@@ -114,14 +114,14 @@ describe('mongoose-autopopulate plugin', function() {
    *  `mongoose-autopopulate` also works on arrays.
    */
   it('supports document arrays', function(done) {
-    var bandSchema = new Schema({
+    const bandSchema = new Schema({
       name: String,
       members: [{ type: ObjectId, ref: 'people', autopopulate: true }]
     });
     bandSchema.plugin(autopopulate);
 
-    var Band = mongoose.model('band4', bandSchema, 'bands');
-    Band.findOne({ name: "Guns N' Roses" }, function(error, doc) {
+    const Band = mongoose.model('band4', bandSchema, 'bands');
+    Band.findOne({ name: 'Guns N\' Roses' }, function(error, doc) {
       assert.ifError(error);
       assert.equal('Axl Rose', doc.members[0].name);
       assert.equal('William Bruce Rose, Jr.', doc.members[0].birthName);
@@ -147,7 +147,7 @@ describe('mongoose-autopopulate plugin', function() {
     const newSchema = Band.schema.clone();
 
     newSchema.options.selectPopulatedPaths = false;
-    let Band2 = mongoose.model('Band2', newSchema, 'bands');
+    const Band2 = mongoose.model('Band2', newSchema, 'bands');
 
     band = yield Band2.findOne().select({ name: 1 });
     assert.ok(!band.members);
@@ -162,14 +162,14 @@ describe('mongoose-autopopulate plugin', function() {
    *  `Band.findOne({ name: "Guns N' Roses" }).populate({ path: 'lead', select: 'name });`
    */
   it('can specify an options argument', function(done) {
-    var bandSchema = new Schema({
+    const bandSchema = new Schema({
       name: String,
       lead: { type: ObjectId, ref: 'people', autopopulate: { select: 'name' } }
     });
     bandSchema.plugin(autopopulate);
 
-    var Band = mongoose.model('band5', bandSchema, 'bands');
-    Band.findOne({ name: "Guns N' Roses" }, function(error, doc) {
+    const Band = mongoose.model('band5', bandSchema, 'bands');
+    Band.findOne({ name: 'Guns N\' Roses' }, function(error, doc) {
       assert.ifError(error);
       assert.equal('Axl Rose', doc.lead.name);
       assert.ok(!doc.lead.birthName);
@@ -185,24 +185,24 @@ describe('mongoose-autopopulate plugin', function() {
    *  example.
    */
   it('can specify a function that returns options', function(done) {
-    var numCalls = 0;
-    var optionsFunction = function() {
+    let numCalls = 0;
+    const optionsFunction = function() {
       ++numCalls;
       return { select: 'name' };
     };
 
-    var bandSchema = new Schema({
+    const bandSchema = new Schema({
       name: String,
       lead: { type: ObjectId, ref: 'people', autopopulate: optionsFunction }
     });
     bandSchema.plugin(autopopulate);
 
-    var Band = mongoose.model('band6', bandSchema, 'bands');
-    Band.find({ name: "Guns N' Roses" }, function(error, docs) {
+    const Band = mongoose.model('band6', bandSchema, 'bands');
+    Band.find({ name: 'Guns N\' Roses' }, function(error, docs) {
       assert.ifError(error);
       assert.equal(1, docs.length);
       assert.equal(1, numCalls);
-      var doc = docs[0];
+      const doc = docs[0];
       assert.equal('Axl Rose', doc.lead.name);
       assert.ok(!doc.lead.birthName);
       done();
@@ -215,14 +215,14 @@ describe('mongoose-autopopulate plugin', function() {
    *  but opt-out for special cases.
    */
   it('can disable autopopulate for individual queries', function(done) {
-    var bandSchema = new Schema({
+    const bandSchema = new Schema({
       name: String,
       lead: { type: ObjectId, ref: 'people', autopopulate: true }
     });
     bandSchema.plugin(autopopulate);
 
-    var Band = mongoose.model('band7', bandSchema, 'bands');
-    Band.findOne({ name: "Guns N' Roses" }, {}, { autopopulate: false }, function(error, doc) {
+    const Band = mongoose.model('band7', bandSchema, 'bands');
+    Band.findOne({ name: 'Guns N\' Roses' }, {}, { autopopulate: false }, function(error, doc) {
       assert.ifError(error);
       assert.ok(doc.lead instanceof mongoose.Types.ObjectId);
       assert.ok(!doc.populated('lead'));
@@ -354,13 +354,13 @@ describe('mongoose-autopopulate plugin', function() {
         // Apply this plugin to all functions except for `save()`
         functions: ['find', 'findOne', 'findOneAndUpdate']
       });
-  
+
       const Band = mongoose.model('band8', bandSchema, 'bands');
 
-      let band = yield Band.findOne({ name: "Guns N' Roses" });
+      let band = yield Band.findOne({ name: 'Guns N\' Roses' });
       assert.ok(band.populated('lead'));
 
-      band = yield Band.findOne({ name: "Guns N' Roses" }).setOptions({ autopopulate: false });
+      band = yield Band.findOne({ name: 'Guns N\' Roses' }).setOptions({ autopopulate: false });
       assert.ok(!band.populated('lead'));
       // `save()` doesn't autopopulate
       yield band.save();
