@@ -16,6 +16,8 @@ module.exports = function autopopulatePlugin(schema, options) {
   }
 
   const autopopulateHandler = function(filter) {
+    const finalPaths = [];
+
     if (this._mongooseOptions &&
         this._mongooseOptions.lean &&
         // If lean and user didn't explicitly do `lean({ autopulate: true })`,
@@ -54,9 +56,15 @@ module.exports = function autopopulatePlugin(schema, options) {
       const optionsToUse = processOption.call(this,
         pathsToPopulate[i].autopopulate, pathsToPopulate[i].options);
       if (optionsToUse) {
-        this.populate(optionsToUse);
+        // If `this` is a query, population chaining is allowed.
+        // If not, add it to an array for single population at the end.
+        if (this.constructor.name === 'Query') this.populate(optionsToUse);
+        else finalPaths.push(optionsToUse);
       }
     }
+
+    // If `this` is a document, population chaining is NOT allowed.
+    if (this.constructor.name === 'Document') return this.populate(finalPaths);
   };
 
   if (testFunction('find')) {
@@ -91,9 +99,7 @@ module.exports = function autopopulatePlugin(schema, options) {
         }
         return true;
       });
-
-      return this.execPopulate();
-    }); 
+    });
   }
 };
 
