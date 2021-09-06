@@ -1,3 +1,7 @@
+0.15.0 / 2021-09-06
+===================
+ * BREAKING CHANGE: use Mongoose 6, drop support for Mongoose 5 #89 #88
+
 0.14.0 / 2021-05-14
 ===================
  * feat: add `functions` option to list out functions to register hooks on
