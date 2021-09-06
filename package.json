@@ -1,11 +1,12 @@
 {
   "name": "mongoose-autopopulate",
-  "version": "0.14.0",
+  "version": "0.15.0",
   "description": "Always populate() certain fields in your mongoose schemas",
   "main": "index.js",
   "homepage": "https://github.com/mongodb-js/mongoose-autopopulate",
   "scripts": {
     "docs": "acquit-markdown -r acquit-ignore -p ./test/integration.js > examples.md",
+    "lint": "eslint .",
     "test": "mocha ./test/*.js",
     "test-integration": "mocha ./test/integration.js",
     "test-travis": "nyc --reporter=lcov npm test && nyc check-coverage --lines 80 --functions 80 --branches 80"
@@ -26,12 +27,13 @@
     "acquit-markdown": "0.1.0",
     "co": "4.6.0",
     "co-mocha": "1.2.2",
+    "eslint": "7.32.0",
     "mocha": "5.1.1",
-    "mongoose": ">= 5.12.4",
+    "mongoose": "6.x",
     "nyc": "11.7.3"
   },
   "peerDependencies": {
-    "mongoose": ">= 5.12.4"
+    "mongoose": "6.x"
   },
   "author": "Valeri Karpov <val@karpov.io>",
   "license": "Apache 2.0",

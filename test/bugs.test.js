@@ -311,7 +311,6 @@ describe('bug fixes', function() {
       });
     
       map = yield Map.findById(map);
-      console.log(map.tiles)
       assert.equal(map.tiles[0][0].enemy.name, 'Bowser');
       assert.equal(map.tiles[0][1].color, 'Blue');
     });

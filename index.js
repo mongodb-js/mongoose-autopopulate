@@ -58,13 +58,15 @@ module.exports = function autopopulatePlugin(schema, options) {
       if (optionsToUse) {
         // If `this` is a query, population chaining is allowed.
         // If not, add it to an array for single population at the end.
-        if (this.constructor.name === 'Query') this.populate(optionsToUse);
-        else finalPaths.push(optionsToUse);
+        if (this.constructor.name === 'Query') {
+          this.populate(optionsToUse);
+        } else {
+          finalPaths.push(optionsToUse);
+        }
       }
     }
 
-    // If `this` is a document, population chaining is NOT allowed.
-    if (this.constructor.name === 'Document') return this.populate(finalPaths);
+    return finalPaths;
   };
 
   if (testFunction('find')) {
@@ -89,7 +91,7 @@ module.exports = function autopopulatePlugin(schema, options) {
       if (typeof this.ownerDocument === 'function') {
         return Promise.resolve();
       }
-      autopopulateHandler.call(this, options => {
+      const finalPaths = autopopulateHandler.call(this, options => {
         const pop = this.populated(options.path);
         if (Array.isArray(pop)) {
           const docVal = this.get(options.path);
@@ -99,6 +101,7 @@ module.exports = function autopopulatePlugin(schema, options) {
         }
         return true;
       });
+      return this.populate(finalPaths);
     });
   }
 };

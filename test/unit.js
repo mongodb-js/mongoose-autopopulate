@@ -6,24 +6,15 @@ describe('mongoose-autopopulate:unit', function() {
   var queryStub;
   var paths = [];
 
-  beforeEach(function() {
-    queryStub = {};
-    queryStub.populate = function(obj) {
-      queryStub.populate.calls.push(obj);
-    };
-    queryStub.populate.calls = [];
-  });
-
   it('populates when paths autopopulate option is true', function() {
     paths = [{ name: 'test', options: { options: { autopopulate: true } } }];
     schemaStub = createSchemaStub(paths);
     var p = plugin(schemaStub);
     assert.equal(schemaStub.pre.calls.length, 3);
-    assert.equal(queryStub.populate.calls.length, 0);
 
-    schemaStub.pre.calls[0].handler.call(queryStub);
-    assert.equal(queryStub.populate.calls.length, 1);
-    assert.equal(queryStub.populate.calls[0].path, 'test');
+    const pathsToPopulate = schemaStub.pre.calls[0].handler.call({});
+    assert.equal(pathsToPopulate.length, 1);
+    assert.equal(pathsToPopulate[0].path, 'test');
   });
 
   it('ignores when paths autopopulate option is falsy', function() {
@@ -35,11 +26,10 @@ describe('mongoose-autopopulate:unit', function() {
     schemaStub = createSchemaStub(paths);
     var p = plugin(schemaStub);
     assert.equal(schemaStub.pre.calls.length, 3);
-    assert.equal(queryStub.populate.calls.length, 0);
 
-    schemaStub.pre.calls[0].handler.call(queryStub);
-    assert.equal(queryStub.populate.calls.length, 1);
-    assert.equal(queryStub.populate.calls[0].path, 'test');
+    const pathsToPopulate = schemaStub.pre.calls[0].handler.call({});
+    assert.equal(pathsToPopulate.length, 1);
+    assert.equal(pathsToPopulate[0].path, 'test');
   });
 
   it('merges options when autopopulate option is object', function() {
@@ -57,11 +47,10 @@ describe('mongoose-autopopulate:unit', function() {
 
     var p = plugin(schemaStub);
     assert.equal(schemaStub.pre.calls.length, 3);
-    assert.equal(queryStub.populate.calls.length, 0);
 
-    schemaStub.pre.calls[0].handler.call(queryStub);
-    assert.equal(queryStub.populate.calls.length, 1);
-    assert.deepEqual(queryStub.populate.calls[0],
+    const pathsToPopulate = schemaStub.pre.calls[0].handler.call({});
+    assert.equal(pathsToPopulate.length, 1);
+    assert.deepEqual(pathsToPopulate[0],
       { path: 'test', select: 'name', options: { _depth: 1, maxDepth: 10 } });
   });
 
@@ -81,11 +70,10 @@ describe('mongoose-autopopulate:unit', function() {
     schemaStub = createSchemaStub(paths);
     var p = plugin(schemaStub);
     assert.equal(schemaStub.pre.calls.length, 3);
-    assert.equal(queryStub.populate.calls.length, 0);
 
-    schemaStub.pre.calls[0].handler.call(queryStub);
-    assert.equal(queryStub.populate.calls.length, 1);
-    assert.deepEqual(queryStub.populate.calls[0].path, 'test');
+    const pathsToPopulate = schemaStub.pre.calls[0].handler.call({});
+    assert.equal(pathsToPopulate.length, 1);
+    assert.deepEqual(pathsToPopulate[0].path, 'test');
   });
 
   it('augments populate options when autopopulate returns object', function() {
@@ -105,11 +93,10 @@ describe('mongoose-autopopulate:unit', function() {
 
     var p = plugin(schemaStub);
     assert.equal(schemaStub.pre.calls.length, 3);
-    assert.equal(queryStub.populate.calls.length, 0);
 
-    schemaStub.pre.calls[0].handler.call(queryStub);
-    assert.equal(queryStub.populate.calls.length, 1);
-    assert.deepEqual(queryStub.populate.calls[0],
+    const pathsToPopulate = schemaStub.pre.calls[0].handler.call({});
+    assert.equal(pathsToPopulate.length, 1);
+    assert.deepEqual(pathsToPopulate[0],
       { path: 'test', select: 'name', options: { maxDepth: 10, _depth: 1 } });
   });
 
@@ -129,10 +116,9 @@ describe('mongoose-autopopulate:unit', function() {
     schemaStub = createSchemaStub(paths);
     var p = plugin(schemaStub);
     assert.equal(schemaStub.pre.calls.length, 3);
-    assert.equal(queryStub.populate.calls.length, 0);
 
-    schemaStub.pre.calls[0].handler.call(queryStub);
-    assert.equal(queryStub.populate.calls.length, 0);
+    const pathsToPopulate = schemaStub.pre.calls[0].handler.call({});
+    assert.equal(pathsToPopulate.length, 0);
   });
 
   it('handles nested schemas', function() {
@@ -156,10 +142,9 @@ describe('mongoose-autopopulate:unit', function() {
 
     var p = plugin(schema);
     assert.equal(schema.pre.calls.length, 3);
-    assert.equal(queryStub.populate.calls.length, 0);
 
-    schema.pre.calls[0].handler.call(queryStub);
-    assert.deepEqual(queryStub.populate.calls[0].path,
+    const pathsToPopulate = schema.pre.calls[0].handler.call({});
+    assert.deepEqual(pathsToPopulate[0].path,
       'nested.test');
   });
 });
