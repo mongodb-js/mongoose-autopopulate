@@ -20,7 +20,7 @@ module.exports = function autopopulatePlugin(schema, options) {
 
     if (this._mongooseOptions &&
         this._mongooseOptions.lean &&
-        // If lean and user didn't explicitly do `lean({ autopulate: true })`,
+        // If lean and user didn't explicitly do `lean({ autopopulate: true })`,
         // skip it. See gh-27, gh-14, gh-48
         !this._mongooseOptions.lean.autopopulate) {
       return;
