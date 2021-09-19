@@ -33,6 +33,7 @@
   "peerDependencies": {
     "mongoose": ">= 5.12.4"
   },
+  "types": "./index.d.ts",
   "author": "Valeri Karpov <val@karpov.io>",
   "license": "Apache 2.0",
   "bugs": {
