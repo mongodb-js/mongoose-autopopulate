@@ -1,3 +1,7 @@
+0.16.0 / 2021-09-22
+===================
+ * feat: add native type definitions #92 #91 [TheVaan](https://github.com/TheVaan)
+
 0.15.0 / 2021-09-06
 ===================
  * BREAKING CHANGE: use Mongoose 6, drop support for Mongoose 5 #89 #88
