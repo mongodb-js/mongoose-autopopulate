@@ -88,7 +88,7 @@ module.exports = function autopopulatePlugin(schema, options) {
       }
       // Skip for subdocs, because we assume this function only runs on
       // top-level documents.
-      if (typeof this.ownerDocument === 'function') {
+      if (this.ownerDocument() !== this) {
         return Promise.resolve();
       }
       const finalPaths = autopopulateHandler.call(this, options => {
