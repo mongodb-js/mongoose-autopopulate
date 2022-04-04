@@ -1,3 +1,7 @@
+0.16.1 / 2022-04-04
+===================
+ * fix: support subdocuments in Mongoose 6.1.x #94
+
 0.16.0 / 2021-09-22
 ===================
  * feat: add native type definitions #92 #91 [TheVaan](https://github.com/TheVaan)
