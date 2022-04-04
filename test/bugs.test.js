@@ -314,4 +314,29 @@ describe('bug fixes', function() {
       assert.equal(map.tiles[0][1].color, 'Blue');
     });
   });
+
+  it('connection option (gh-93)', async function() {
+    const userSchema = new Schema({
+      name: String
+    });
+
+    const conn2 = await mongoose.createConnection('mongodb://localhost:27017/test');
+    const User = conn2.model('User', userSchema);
+
+    const responseSchema = new Schema({
+      user: {
+        type: Schema.Types.ObjectId,
+        ref: 'User',
+        autopopulate: { connection: conn2 }
+      }
+    });
+    responseSchema.plugin(autopopulate);
+    const Response = db.model('Response', responseSchema);
+
+    const user = await User.create({ name: 'test' });
+    const response = await Response.create({ user: user._id });
+
+    const res = await Response.findById(response);
+    console.log(res.user.name); // 'test'
+  });
 });
