@@ -171,17 +171,6 @@ function getPathsToPopulate(schema) {
     }
   });
 
-  if (schema.virtuals) {
-    Object.keys(schema.virtuals).forEach(function(pathname) {
-      if (schema.virtuals[pathname].options.autopopulate) {
-        pathsToPopulate.push({
-          options: defaultOptions(pathname, schema.virtuals[pathname].options),
-          autopopulate: schema.virtuals[pathname].options.autopopulate
-        });
-      }
-    });
-  }
-
   return pathsToPopulate;
 }
 
@@ -263,4 +252,12 @@ function eachPathRecursive(schema, handler, path) {
     }
     path.pop();
   });
+
+  if (schema.virtuals) {
+    Object.keys(schema.virtuals).forEach(function(pathname) {
+      path.push(pathname);
+      handler(path.join('.'), schema.virtuals[pathname]);
+      path.pop();
+    });
+  }
 }

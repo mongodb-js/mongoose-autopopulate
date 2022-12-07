@@ -148,6 +148,47 @@ describe('mongoose-autopopulate:unit', function() {
     assert.deepEqual(pathsToPopulate[0].path,
       'nested.test');
   });
+
+  it('handles top-level populated virtuals', () => {
+    schemaStub = createSchemaStub([]);
+    schemaStub.virtuals = {
+      test: {
+        options: { autopopulate: true }
+      }
+    };
+
+    plugin(schemaStub);
+    assert.equal(schemaStub.pre.calls.length, 3);
+
+    const pathsToPopulate = schemaStub.pre.calls[0].handler.call({});
+    assert.equal(pathsToPopulate.length, 1);
+    assert.equal(pathsToPopulate[0].path, 'test');
+  });
+
+  it('handles nested populated virtuals', () => {
+    const nestedSchema = createSchemaStub([]);
+    nestedSchema.virtuals = {
+      test: {
+        options: { autopopulate: true }
+      }
+    };
+
+    const topLevel = {
+      name: 'nested',
+      options: {
+        schema: nestedSchema
+      }
+    };
+
+    const schema = createSchemaStub([topLevel]);
+
+    plugin(schema);
+    assert.equal(schema.pre.calls.length, 3);
+
+    const pathsToPopulate = schema.pre.calls[0].handler.call({});
+    assert.equal(pathsToPopulate.length, 1);
+    assert.equal(pathsToPopulate[0].path, 'nested.test');
+  });
 });
 
 function createSchemaStub(paths) {
