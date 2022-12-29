@@ -1,3 +1,7 @@
+0.17.0 / 2022-12-28
+===================
+ * feat: add support for nested autopopulated virtuals #105 #104 [Danchoys](https://github.com/Danchoys)
+
 0.16.1 / 2022-04-04
 ===================
  * fix: support subdocuments in Mongoose 6.1.x #94
