@@ -339,4 +339,37 @@ describe('bug fixes', function() {
     const res = await Response.findById(response);
     console.log(res.user.name); // 'test'
   });
+
+  it('handles recursive duplicates gh-101', async function() {
+    const sectionSchema = new Schema({
+      template: { 
+      type:Schema.Types.ObjectId ,
+      ref: 'OtherModel',
+      autopopulate: false,
+      required: false
+      },
+      text: String,
+      date: Date,
+    });
+    
+    sectionSchema.add({
+      subSections: {
+        type: [sectionSchema]
+      }
+    });
+    
+    const otherSchema = new mongoose.Schema({
+    })
+
+    const conn = await mongoose.createConnection('mongodb://localhost:27017');
+    sectionSchema.plugin(autopopulate);
+  
+    const Test = conn.model('Test', sectionSchema);
+
+    const doc = await Test.create({
+      text: "hello",
+      date: new Date(),
+    });
+    assert.ok(doc);
+  });
 });
