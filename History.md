@@ -1,3 +1,7 @@
+0.17.1 / 2022-01-03
+===================
+ * fix: handle infinite schema recursion #106 #101 [IslandRhythms](https://github.com/IslandRhythms)
+
 0.17.0 / 2022-12-28
 ===================
  * feat: add support for nested autopopulated virtuals #105 #104 [Danchoys](https://github.com/Danchoys)
