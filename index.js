@@ -1,5 +1,7 @@
 'use strict';
 
+const schemaStack = new WeakMap();
+
 module.exports = function autopopulatePlugin(schema, options) {
   const pathsToPopulate = getPathsToPopulate(schema);
 
@@ -221,9 +223,15 @@ function handleFunction(fn, options) {
 }
 
 function eachPathRecursive(schema, handler, path) {
+
+  if (schemaStack.has(schema)) {
+    return;
+  }
   if (!path) {
     path = [];
   }
+  schemaStack.set(schema, true);
+
   schema.eachPath(function(pathname, schemaType) {
     path.push(pathname);
     if (schemaType.schema) {
@@ -252,7 +260,7 @@ function eachPathRecursive(schema, handler, path) {
     }
     path.pop();
   });
-
+  schemaStack.delete(schema);
   if (schema.virtuals) {
     Object.keys(schema.virtuals).forEach(function(pathname) {
       path.push(pathname);
