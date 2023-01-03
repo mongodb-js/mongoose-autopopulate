@@ -150,7 +150,7 @@ function autopopulateDiscriminators(res) {
 
 function getPathsToPopulate(schema) {
   const pathsToPopulate = [];
-
+  const schemaStack = new WeakMap();
   eachPathRecursive(schema, function(pathname, schemaType) {
     let option;
     if (schemaType.options && schemaType.options.autopopulate) {
@@ -169,7 +169,7 @@ function getPathsToPopulate(schema) {
         autopopulate: option
       });
     }
-  });
+  }, null, schemaStack);
 
   return pathsToPopulate;
 }
@@ -220,14 +220,20 @@ function handleFunction(fn, options) {
   return processOption.call(this, val, options);
 }
 
-function eachPathRecursive(schema, handler, path) {
+function eachPathRecursive(schema, handler, path, schemaStack) {
+
+  if (schemaStack.has(schema)) {
+    return;
+  }
   if (!path) {
     path = [];
   }
+  schemaStack.set(schema, true);
+
   schema.eachPath(function(pathname, schemaType) {
     path.push(pathname);
     if (schemaType.schema) {
-      eachPathRecursive(schemaType.schema, handler, path);
+      eachPathRecursive(schemaType.schema, handler, path, schemaStack);
 
       if (schemaType.schema.discriminators != null) {
         for (const discriminatorName of Object.keys(schemaType.schema.discriminators)) {
@@ -239,11 +245,11 @@ function eachPathRecursive(schema, handler, path) {
         schemaType = schemaType.$embeddedSchemaType;
       }
       if (schemaType != null && schemaType.$isMongooseDocumentArray) {
-        eachPathRecursive(schemaType.schema, handler, path);
+        eachPathRecursive(schemaType.schema, handler, path, schemaStack);
 
         if (schemaType.schema.discriminators != null) {
           for (const discriminatorName of Object.keys(schemaType.schema.discriminators)) {
-            eachPathRecursive(schemaType.schema.discriminators[discriminatorName], handler, path);
+            eachPathRecursive(schemaType.schema.discriminators[discriminatorName], handler, path, schemaStack);
           }
         }
       }
@@ -252,7 +258,7 @@ function eachPathRecursive(schema, handler, path) {
     }
     path.pop();
   });
-
+  schemaStack.delete(schema);
   if (schema.virtuals) {
     Object.keys(schema.virtuals).forEach(function(pathname) {
       path.push(pathname);
