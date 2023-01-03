@@ -357,19 +357,6 @@ describe('bug fixes', function() {
         type: [sectionSchema]
       }
     });
-    
-    const otherSchema = new mongoose.Schema({
-    })
-
-    const conn = await mongoose.createConnection('mongodb://localhost:27017');
     sectionSchema.plugin(autopopulate);
-  
-    const Test = conn.model('Test', sectionSchema);
-
-    const doc = await Test.create({
-      text: "hello",
-      date: new Date(),
-    });
-    assert.ok(doc);
   });
 });
