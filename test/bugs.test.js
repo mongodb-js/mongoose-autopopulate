@@ -10,14 +10,11 @@ describe('bug fixes', function() {
   let db;
 
   before(function() {
-    db = mongoose.createConnection('mongodb://localhost:27017/autopopulate', {
-      useUnifiedTopology: true,
-      useNewUrlParser: true
-    });
+    db = mongoose.createConnection('mongodb://localhost:27017/autopopulate');
   });
 
-  after(function(done) {
-    db.close(done);
+  after(async function() {
+    await db.close();
   });
 
   beforeEach(function() {
@@ -30,7 +27,7 @@ describe('bug fixes', function() {
     return Promise.all(promises);
   });
 
-  it('gh-15', function(done) {
+  it('gh-15', async function() {
     const opts = {
       timestamps: { createdAt: 'createdAt' },
       collection: 'collections',
@@ -56,26 +53,15 @@ describe('bug fixes', function() {
     inheritSchema.plugin(autopopulate);
     const Inherit = Root.discriminator('inherit', inheritSchema);
 
-    Tag.create([{ name: 'cool' }, { name: 'sweet' }], function(error, docs) {
-      assert.ifError(error);
-      const doc = {
-        name: 'Test',
-        customTags: [{ item: docs[0]._id }, { item: docs[1]._id }]
-      };
-      Inherit.create(doc, function(error, doc) {
-        assert.ifError(error);
-        test(doc._id);
-      });
-    });
-
-    function test(id) {
-      Inherit.findById(id).exec(function(error, doc) {
-        assert.ifError(error);
-        assert.equal(doc.customTags[0].item.name, 'cool');
-        assert.equal(doc.customTags[1].item.name, 'sweet');
-        done();
-      });
-    }
+    const docs = await Tag.create([{ name: 'cool' }, { name: 'sweet' }]);
+    let doc = {
+      name: 'Test',
+      customTags: [{ item: docs[0]._id }, { item: docs[1]._id }]
+    };
+    doc = await Inherit.create(doc);
+    doc = await Inherit.findById(doc);
+    assert.equal(doc.customTags[0].item.name, 'cool');
+    assert.equal(doc.customTags[1].item.name, 'sweet');
   });
 
   it('findOneAndUpdate (gh-6641)', function() {
