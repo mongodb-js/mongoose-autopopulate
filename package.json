@@ -25,15 +25,13 @@
     "acquit": "1.0.0",
     "acquit-ignore": "0.0.3",
     "acquit-markdown": "0.1.0",
-    "co": "4.6.0",
-    "co-mocha": "1.2.2",
     "eslint": "7.32.0",
     "mocha": "5.1.1",
-    "mongoose": "6.x",
+    "mongoose": "7.0.0-rc0",
     "nyc": "11.7.3"
   },
   "peerDependencies": {
-    "mongoose": "6.x"
+    "mongoose": "6.x || 7.0.0-rc0"
   },
   "types": "./index.d.ts",
   "author": "Valeri Karpov <val@karpov.io>",
