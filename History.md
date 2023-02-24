@@ -1,3 +1,7 @@
+1.0.0-rc0 / 2023-02-24
+======================
+ * feat: support mongoose 7
+
 0.17.1 / 2022-01-03
 ===================
  * fix: handle infinite schema recursion #106 #101 [IslandRhythms](https://github.com/IslandRhythms)

@@ -7,9 +7,6 @@ Always `populate()` certain fields in your mongoose schemas
 
 [Read the docs here](http://plugins.mongoosejs.io/plugins/autopopulate).
 
-**Note:** This plugin will *only* work with mongoose >= 4.0. Do NOT use
-this plugin with mongoose 3.x. You have been warned.
-
 **Note:** population is a powerful feature, but it has limitations and
 helps you get away with poor schema design.  In particular, it is usually
 bad MongoDB schema design to include arrays that grow without bound in
