@@ -2,7 +2,6 @@
 
 const assert = require('assert');
 const autopopulate = require('../');
-const co = require('co');
 const mongoose = require('mongoose');
 const Schema = mongoose.Schema;
 
