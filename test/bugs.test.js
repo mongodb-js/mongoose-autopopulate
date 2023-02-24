@@ -9,7 +9,7 @@ describe('bug fixes', function() {
   let db;
 
   before(function() {
-    db = mongoose.createConnection('mongodb://localhost:27017/autopopulate');
+    db = mongoose.createConnection('mongodb://127.0.0.1:27017/autopopulate');
   });
 
   after(async function() {
@@ -293,7 +293,7 @@ describe('bug fixes', function() {
       name: String
     });
 
-    const conn2 = await mongoose.createConnection('mongodb://localhost:27017/test');
+    const conn2 = await mongoose.createConnection('mongodb://127.0.0.1:27017/test');
     const User = conn2.model('User', userSchema);
 
     const responseSchema = new Schema({

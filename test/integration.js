@@ -12,7 +12,7 @@ describe('mongoose-autopopulate plugin', function() {
   let Person;
 
   before(async function() {
-    mongoose.connect('mongodb://localhost:27017/autopopulate');
+    mongoose.connect('mongodb://127.0.0.1:27017/autopopulate');
 
     const personSchema = new Schema({ name: String, birthName: String });
     const bandSchema = new Schema({
