@@ -2,13 +2,10 @@
 
 const assert = require('assert');
 const autopopulate = require('../');
-const co = require('co');
 const mongoose = require('mongoose');
 
 const Schema = mongoose.Schema;
 const ObjectId = mongoose.Schema.Types.ObjectId;
-
-require('co-mocha')(require('mocha'));
 
 describe('mongoose-autopopulate plugin', function() {
   let Band;
@@ -88,13 +85,13 @@ describe('mongoose-autopopulate plugin', function() {
       lead: { type: ObjectId, ref: 'people', autopopulate: true }
     });
     bandSchema.plugin(autopopulate);
-  
+
     const Band = mongoose.model('band3', bandSchema, 'bands');
     const doc = await Band.findOne({ name: 'Guns N\' Roses' });
     assert.equal('Axl Rose', doc.lead.name);
     assert.equal('William Bruce Rose, Jr.', doc.lead.birthName);
   });
-  
+
 
   /**
    *  `mongoose-autopopulate` also works on arrays.
@@ -105,13 +102,13 @@ describe('mongoose-autopopulate plugin', function() {
       members: [{ type: ObjectId, ref: 'people', autopopulate: true }]
     });
     bandSchema.plugin(autopopulate);
-  
+
     const Band = mongoose.model('band4', bandSchema, 'bands');
     const doc = await Band.findOne({ name: 'Guns N\' Roses' });
     assert.equal('Axl Rose', doc.members[0].name);
     assert.equal('William Bruce Rose, Jr.', doc.members[0].birthName);
   });
-  
+
   /**
    *  By default, Mongoose 5.x automatically projects in populated properties.
    *  That means you need a little extra work to exclude autopopulated fields.
@@ -150,7 +147,7 @@ describe('mongoose-autopopulate plugin', function() {
       lead: { type: ObjectId, ref: 'people', autopopulate: { select: 'name' } }
     });
     bandSchema.plugin(autopopulate);
-  
+
     const Band = mongoose.model('band5', bandSchema, 'bands');
     const doc = await Band.findOne({ name: 'Guns N\' Roses' });
     assert.equal('Axl Rose', doc.lead.name);
@@ -164,19 +161,19 @@ describe('mongoose-autopopulate plugin', function() {
    *  The below `populate()` uses the same options as the previous
    *  example.
    */
-  it('can specify a function that returns options', async () => {
+  it('can specify a function that returns options', async() => {
     let numCalls = 0;
     const optionsFunction = function() {
       ++numCalls;
       return { select: 'name' };
     };
-  
+
     const bandSchema = new Schema({
       name: String,
       lead: { type: ObjectId, ref: 'people', autopopulate: optionsFunction }
     });
     bandSchema.plugin(autopopulate);
-  
+
     const Band = mongoose.model('band6', bandSchema, 'bands');
     const docs = await Band.find({ name: 'Guns N\' Roses' });
     assert.equal(1, docs.length);
@@ -184,26 +181,26 @@ describe('mongoose-autopopulate plugin', function() {
     const doc = docs[0];
     assert.equal('Axl Rose', doc.lead.name);
     assert.ok(!doc.lead.birthName);
-  });  
+  });
 
   /**
    *  If you set the `autopopulate` option to `false` on a query, autopopulate
    *  will be disabled. This is handy if you want to autopopulate by default,
    *  but opt-out for special cases.
    */
-  it('can disable autopopulate for individual queries', async () => {
+  it('can disable autopopulate for individual queries', async() => {
     const bandSchema = new Schema({
       name: String,
       lead: { type: ObjectId, ref: 'people', autopopulate: true }
     });
     bandSchema.plugin(autopopulate);
-  
+
     const Band = mongoose.model('band7', bandSchema, 'bands');
     const doc = await Band.findOne({ name: 'Guns N\' Roses' }, {}, { autopopulate: false });
     assert.ok(doc.lead instanceof mongoose.Types.ObjectId);
     assert.ok(!doc.populated('lead'));
   });
-  
+
 
   /**
    *  Say you have a model `User` that has the autopopulate plugin and you're
