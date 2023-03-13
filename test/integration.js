@@ -327,4 +327,34 @@ describe('mongoose-autopopulate plugin', function() {
     await band.save();
     assert.ok(!band.populated('lead'));
   });
+  it('supports findOneAndDelete', async function() {
+    const bandSchema = new Schema({
+      name: String,
+      lead: { type: ObjectId, ref: 'people', autopopulate: true }
+    });
+    bandSchema.plugin(autopopulate, {
+      functions: ['findOneAndDelete']
+    });
+
+    const Band = mongoose.model('band9', bandSchema, 'bands');
+
+    const band = await Band.findOneAndDelete({ name: 'Guns N\' Roses' });
+    assert.ok(band.populated('lead'));
+  });
+  it('supports findOneAndReplace', async function() {
+    const bandSchema = new Schema({
+      name: String,
+      lead: { type: ObjectId, ref: 'people', autopopulate: true }
+    });
+    bandSchema.plugin(autopopulate, {
+      functions: ['findOneAndReplace']
+    });
+
+    const Band = mongoose.model('band10', bandSchema, 'bands');
+    const p = await Person.create({ name: 'Test', birthName: 'Testerson' });
+    const band = await Band.findOneAndReplace({ name: 'Guns N\' Roses' }, { name: 'Testing123', lead: p._id });
+    const newBand = await Band.findOne({ name: 'Testing123' });
+    assert.ok(band.populated('lead'));
+    assert.equal(newBand.name, 'Testing123');
+  });
 });
