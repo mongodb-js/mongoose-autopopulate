@@ -12,7 +12,7 @@ describe('mongoose-autopopulate plugin', function() {
   let Person;
 
   before(async function() {
-    mongoose.connect('mongodb://127.0.0.1:27017/autopopulate');
+    await mongoose.connect('mongodb://127.0.0.1:27017/autopopulate');
 
     const personSchema = new Schema({ name: String, birthName: String });
     const bandSchema = new Schema({
@@ -23,7 +23,9 @@ describe('mongoose-autopopulate plugin', function() {
     bandSchema.plugin(autopopulate);
     Person = mongoose.model('people', personSchema, 'people');
     Band = mongoose.model('band', bandSchema, 'bands');
+  });
 
+  beforeEach(async function() {
     const axl = {
       name: 'Axl Rose',
       birthName: 'William Bruce Rose, Jr.'
