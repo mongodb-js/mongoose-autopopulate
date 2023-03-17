@@ -81,6 +81,14 @@ module.exports = function autopopulatePlugin(schema, options) {
     schema.pre('findOneAndUpdate', function() { return autopopulateHandler.call(this); });
     schema.post('findOneAndUpdate', function(res) { return autopopulateDiscriminators.call(this, res); });
   }
+  if (testFunction('findOneAndDelete')) {
+    schema.pre('findOneAndDelete', function() { return autopopulateHandler.call(this); });
+    schema.post('findOneAndDelete', function(res) { return autopopulateDiscriminators.call(this, res); });
+  }
+  if (testFunction('findOneAndReplace')) {
+    schema.pre('findOneAndReplace', function() { return autopopulateHandler.call(this); });
+    schema.post('findOneAndReplace', function(res) { return autopopulateDiscriminators.call(this, res); });
+  }
   if (testFunction('save')) {
     schema.post('save', function() {
       if (pathsToPopulate.length === 0) {
