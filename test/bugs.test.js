@@ -332,4 +332,32 @@ describe('bug fixes', function() {
     });
     sectionSchema.plugin(autopopulate);
   });
+
+  it('handles nested discriminator (gh-113)', async function() {
+    const sectionSchema = new Schema({
+      subdoc: new Schema({
+        name: String
+      })
+    });
+    sectionSchema.path('subdoc').discriminator('Test', new Schema({
+      subSection: {
+        type: 'ObjectId',
+        ref: 'SubSection',
+        autopopulate: true
+      }
+    }));
+    sectionSchema.plugin(autopopulate);
+    const Section = db.model('Section', sectionSchema);
+    const SubSection = db.model('SubSection', new Schema({ name: String }));
+
+    const subsection = await SubSection.create({ name: 'foo' });
+    let section = await Section.create({
+      subdoc: {
+        __t: 'Test',
+        subSection: subsection._id
+      }
+    });
+    section = await Section.findById(section);
+    assert.equal(section.subdoc.subSection.name, 'foo');
+  });
 });

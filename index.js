@@ -245,7 +245,12 @@ function eachPathRecursive(schema, handler, path, schemaStack) {
 
       if (schemaType.schema.discriminators != null) {
         for (const discriminatorName of Object.keys(schemaType.schema.discriminators)) {
-          eachPathRecursive(schemaType.schema.discriminators[discriminatorName], handler, path);
+          eachPathRecursive(
+            schemaType.schema.discriminators[discriminatorName],
+            handler,
+            path,
+            schemaStack
+          );
         }
       }
     } else if (schemaType.$isMongooseArray && schemaType.$embeddedSchemaType.$isMongooseArray) {
@@ -257,7 +262,12 @@ function eachPathRecursive(schema, handler, path, schemaStack) {
 
         if (schemaType.schema.discriminators != null) {
           for (const discriminatorName of Object.keys(schemaType.schema.discriminators)) {
-            eachPathRecursive(schemaType.schema.discriminators[discriminatorName], handler, path, schemaStack);
+            eachPathRecursive(
+              schemaType.schema.discriminators[discriminatorName],
+              handler,
+              path,
+              schemaStack
+            );
           }
         }
       }
