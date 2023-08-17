@@ -360,4 +360,121 @@ describe('bug fixes', function() {
     section = await Section.findById(section);
     assert.equal(section.subdoc.subSection.name, 'foo');
   });
+  it('supports the `refPath` option (gh-96)', async function() {
+    const AddressSchema = new Schema(
+      {
+        name: {
+          type: String
+        },
+        status: {
+          type: String,
+          enum: ["active", "inactive"],
+          default: "active"
+        }
+      },
+      {
+        timestamps: true,
+        toJSON: { virtuals: true },
+        toObject: { virtuals: true }
+      }
+    );
+    
+    AddressSchema.virtual("residentials", {
+      ref: "Citizen",
+      localField: "_id",
+      foreignField: "permanentAddress.address",
+      justOne: false,
+      autopopulate: true,
+      match: {
+        status: "active"
+      },
+      options: {
+        select:
+          "name nId"
+      }
+    });
+    
+    AddressSchema.plugin(autopopulate);
+    
+    
+    const CitizenSchema = new Schema(
+      {
+        nId: {
+          type: String,
+          required: [true, "Please add national ID card"]
+        },
+        name: {
+          type: String,
+          required: [true, "Please add a name"],
+          trim: true
+        },
+        permanentAddress: {
+          name: {
+            type: String,
+            trim: true
+          },
+          address: {
+            type: mongoose.Schema.ObjectId,
+            ref: "Address"
+          },
+        },
+        father: {
+          type: mongoose.Schema.ObjectId,
+          refPath: "fatherType",
+          autopopulate: true
+        },
+        fatherType: {
+          type: String,
+          enum: ["Citizen", "Guest"],
+          required: true
+        },
+        status: {
+          type: String,
+          enum: ["active", "inactive"],
+          default: "active"
+        }
+      },
+      {
+        timestamps: true,
+        toJSON: { virtuals: true },
+        toObject: { virtuals: true }
+      }
+    );
+    
+    CitizenSchema.plugin(autopopulate);
+    
+    
+    const Address = db.model('Address', AddressSchema);
+    
+    const Citizen = db.model('Citizen', CitizenSchema);
+    const entry = await Address.create({
+      name: "Another name for The Address",
+      status: "active"
+    });
+  
+    const doc = await Citizen.create({
+      nId: 'Hello',
+      name: 'There',
+      permanentAddress: {
+        name: 'The Address',
+        address: entry._id
+      },
+      fatherType: "Guest"
+    });
+    await Citizen.create({
+      nId: 'Yo',
+      name: 'Test',
+      permanentAddress: {
+        name: "The Address",
+        address: entry._id
+      },
+      father: doc._id,
+      fatherType: "Citizen",
+      status: "active"
+    });
+
+    const addr = await Address.findOne();
+    const testDoc = addr.residentials.find(x => x.father != null);
+    assert.equal(testDoc.father.fatherType, 'Guest'); // property doesn't matter, just need to ensure its being populated
+  });
 });
