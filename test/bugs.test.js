@@ -594,7 +594,7 @@ describe('bug fixes', function() {
       fatherType: 'Citizen',
       status: 'active'
     });
-    const addr = await Address.findOne().populate({ path: 'residentials', populate: { path: 'permanentAddress.address'} });
+    const addr = await Address.findOne().populate({ path: 'residentials', populate: { path: 'permanentAddress.address' } });
     assert.notEqual(addr.residentials[0].permanentAddress.address.name, undefined);
   });
 });
