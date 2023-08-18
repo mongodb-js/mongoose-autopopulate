@@ -506,7 +506,6 @@ describe('bug fixes', function() {
       localField: '_id',
       foreignField: 'permanentAddress.address',
       justOne: false,
-      autopopulate: true,
       match: {
         status: 'active'
       },
@@ -595,7 +594,7 @@ describe('bug fixes', function() {
       fatherType: 'Citizen',
       status: 'active'
     });
-    const addr = await Address.findOne().populate({ path: 'residentials', populate: { path: 'permanentAddress', populate: 'address'} });
+    const addr = await Address.findOne().populate({ path: 'residentials', populate: { path: 'permanentAddress.address'} });
     assert.notEqual(addr.residentials[0].permanentAddress.address.name, undefined);
   });
 });
