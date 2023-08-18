@@ -16,6 +16,10 @@ describe('bug fixes', function() {
     await db.close();
   });
 
+  afterEach(function() {
+    db.deleteModel(/.+/);
+  });
+
   beforeEach(function() {
     const promises = [];
     for (const modelName of Object.keys(db.models)) {
@@ -368,8 +372,8 @@ describe('bug fixes', function() {
         },
         status: {
           type: String,
-          enum: ["active", "inactive"],
-          default: "active"
+          enum: ['active', 'inactive'],
+          default: 'active'
         }
       },
       {
@@ -378,34 +382,34 @@ describe('bug fixes', function() {
         toObject: { virtuals: true }
       }
     );
-    
-    AddressSchema.virtual("residentials", {
-      ref: "Citizen",
-      localField: "_id",
-      foreignField: "permanentAddress.address",
+
+    AddressSchema.virtual('residentials', {
+      ref: 'Citizen',
+      localField: '_id',
+      foreignField: 'permanentAddress.address',
       justOne: false,
       autopopulate: true,
       match: {
-        status: "active"
+        status: 'active'
       },
       options: {
         select:
-          "name nId"
+          'name nId'
       }
     });
-    
+
     AddressSchema.plugin(autopopulate);
-    
-    
+
+
     const CitizenSchema = new Schema(
       {
         nId: {
           type: String,
-          required: [true, "Please add national ID card"]
+          required: [true, 'Please add national ID card']
         },
         name: {
           type: String,
-          required: [true, "Please add a name"],
+          required: [true, 'Please add a name'],
           trim: true
         },
         permanentAddress: {
@@ -415,23 +419,23 @@ describe('bug fixes', function() {
           },
           address: {
             type: mongoose.Schema.ObjectId,
-            ref: "Address"
-          },
+            ref: 'Address'
+          }
         },
         father: {
           type: mongoose.Schema.ObjectId,
-          refPath: "fatherType",
+          refPath: 'fatherType',
           autopopulate: true
         },
         fatherType: {
           type: String,
-          enum: ["Citizen", "Guest"],
+          enum: ['Citizen', 'Guest'],
           required: true
         },
         status: {
           type: String,
-          enum: ["active", "inactive"],
-          default: "active"
+          enum: ['active', 'inactive'],
+          default: 'active'
         }
       },
       {
@@ -440,18 +444,20 @@ describe('bug fixes', function() {
         toObject: { virtuals: true }
       }
     );
-    
+
     CitizenSchema.plugin(autopopulate);
-    
-    
+
+
     const Address = db.model('Address', AddressSchema);
-    
+
     const Citizen = db.model('Citizen', CitizenSchema);
+    await Address.deleteMany({});
+    await Citizen.deleteMany({});
     const entry = await Address.create({
-      name: "Another name for The Address",
-      status: "active"
+      name: 'Another name for The Address',
+      status: 'active'
     });
-  
+
     const doc = await Citizen.create({
       nId: 'Hello',
       name: 'There',
@@ -459,22 +465,137 @@ describe('bug fixes', function() {
         name: 'The Address',
         address: entry._id
       },
-      fatherType: "Guest"
+      fatherType: 'Guest'
     });
     await Citizen.create({
       nId: 'Yo',
       name: 'Test',
       permanentAddress: {
-        name: "The Address",
+        name: 'The Address',
         address: entry._id
       },
       father: doc._id,
-      fatherType: "Citizen",
-      status: "active"
+      fatherType: 'Citizen',
+      status: 'active'
+    });
+    const citizen = await Citizen.find();
+    const testDoc = citizen.find(x => x.father != null);
+    assert.equal(testDoc.father.fatherType, 'Guest');
+  });
+  it('`refPath` works without autopopulate on the virtual (gh-96)', async function() {
+    const AddressSchema = new Schema(
+      {
+        name: {
+          type: String
+        },
+        status: {
+          type: String,
+          enum: ['active', 'inactive'],
+          default: 'active'
+        }
+      },
+      {
+        timestamps: true,
+        toJSON: { virtuals: true },
+        toObject: { virtuals: true }
+      }
+    );
+
+    AddressSchema.virtual('residentials', {
+      ref: 'Citizen',
+      localField: '_id',
+      foreignField: 'permanentAddress.address',
+      justOne: false,
+      autopopulate: true,
+      match: {
+        status: 'active'
+      },
+      options: {
+        select:
+          'name nId'
+      }
     });
 
-    const addr = await Address.findOne();
-    const testDoc = addr.residentials.find(x => x.father != null);
-    assert.equal(testDoc.father.fatherType, 'Guest'); // property doesn't matter, just need to ensure its being populated
+    AddressSchema.plugin(autopopulate);
+
+
+    const CitizenSchema = new Schema(
+      {
+        nId: {
+          type: String,
+          required: [true, 'Please add national ID card']
+        },
+        name: {
+          type: String,
+          required: [true, 'Please add a name'],
+          trim: true
+        },
+        permanentAddress: {
+          name: {
+            type: String,
+            trim: true
+          },
+          address: {
+            type: mongoose.Schema.ObjectId,
+            ref: 'Address'
+          }
+        },
+        father: {
+          type: mongoose.Schema.ObjectId,
+          refPath: 'fatherType'
+        },
+        fatherType: {
+          type: String,
+          enum: ['Citizen', 'Guest'],
+          required: true
+        },
+        status: {
+          type: String,
+          enum: ['active', 'inactive'],
+          default: 'active'
+        }
+      },
+      {
+        timestamps: true,
+        toJSON: { virtuals: true },
+        toObject: { virtuals: true }
+      }
+    );
+
+    CitizenSchema.plugin(autopopulate);
+
+
+    const Address = db.model('Address', AddressSchema);
+
+    const Citizen = db.model('Citizen', CitizenSchema);
+    await Address.deleteMany({});
+    await Citizen.deleteMany({});
+    const entry = await Address.create({
+      name: 'Another name for The Address',
+      status: 'active'
+    });
+
+    const doc = await Citizen.create({
+      nId: 'Hello',
+      name: 'There',
+      permanentAddress: {
+        name: 'The Address',
+        address: entry._id
+      },
+      fatherType: 'Guest'
+    });
+    await Citizen.create({
+      nId: 'Yo',
+      name: 'Test',
+      permanentAddress: {
+        name: 'The Address',
+        address: entry._id
+      },
+      father: doc._id,
+      fatherType: 'Citizen',
+      status: 'active'
+    });
+    const addr = await Address.findOne().populate({ path: 'residentials', populate: { path: 'permanentAddress', populate: 'address'} });
+    assert.notEqual(addr.residentials[0].permanentAddress.address.name, undefined);
   });
 });

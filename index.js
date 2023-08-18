@@ -36,7 +36,6 @@ module.exports = function autopopulatePlugin(schema, options) {
     }
 
     const depth = options._depth != null ? options._depth : 0;
-
     if (options.maxDepth > 0 && depth >= options.maxDepth) {
       return;
     }
@@ -48,7 +47,6 @@ module.exports = function autopopulatePlugin(schema, options) {
         continue;
       }
       pathsToPopulate[i].options.options = pathsToPopulate[i].options.options || {};
-
       const newOptions = { _depth: depth + 1 };
       if (options.maxDepth) newOptions.maxDepth = options.maxDepth;
       Object.assign(pathsToPopulate[i].options.options, newOptions);
@@ -176,7 +174,6 @@ function getPathsToPopulate(schema) {
       });
     }
   }, null, schemaStack);
-
   return pathsToPopulate;
 }
 
