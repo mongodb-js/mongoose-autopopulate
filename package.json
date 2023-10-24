@@ -27,7 +27,7 @@
     "acquit-markdown": "0.1.0",
     "eslint": "7.32.0",
     "mocha": "5.1.1",
-    "mongoose": "7.0.0",
+    "mongoose": "7.3.3",
     "nyc": "11.7.3"
   },
   "peerDependencies": {
