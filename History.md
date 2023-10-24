@@ -1,3 +1,7 @@
+1.1.0 / 2023-10-24
+==================
+ * feat: support mongoose 8
+
 1.0.1 / 2023-05-05
 ==================
  * fix: support nested discriminators #113 #107
