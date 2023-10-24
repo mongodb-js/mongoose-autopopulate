@@ -31,7 +31,7 @@
     "nyc": "11.7.3"
   },
   "peerDependencies": {
-    "mongoose": "6.x || 7.x"
+    "mongoose": "6.x || 7.x || 8.0.0-rc0 || 8.x"
   },
   "types": "./index.d.ts",
   "author": "Valeri Karpov <val@karpov.io>",
