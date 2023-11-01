@@ -27,11 +27,11 @@
     "acquit-markdown": "0.1.0",
     "eslint": "7.32.0",
     "mocha": "5.1.1",
-    "mongoose": "7.0.0",
+    "mongoose": "8.x",
     "nyc": "11.7.3"
   },
   "peerDependencies": {
-    "mongoose": "6.x || 7.x || 8.0.0-rc0 || 8.x"
+    "mongoose": "6.x || 7.x || 8.x"
   },
   "types": "./index.d.ts",
   "author": "Valeri Karpov <val@karpov.io>",
